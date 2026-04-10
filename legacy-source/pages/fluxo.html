@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxo Curricular — Eng. Elétrica UFJF</title>
+<link rel="icon" type="image/png" href="../assets/images/branding/helpieee-favicon.png">
+<script src="../assets/js/theme.js?v=20260328a"></script>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/pages/fluxo.css?v=20260409a">
+</head>
+<body class="page-flow">
+
+<div class="flow-header">
+  <h1 id="flow-title">Fluxo Curricular — Eng. Elétrica: Sistemas Eletrônicos</h1>
+  <p id="flow-subtitle">UFJF · 69A · Clique em uma disciplina para ver pré-requisitos e o que ela desbloqueia</p>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot legend-dot--default"></div>
+      Disciplina
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot--selected"></div>
+      Selecionada
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot--prereq"></div>
+      Pré-requisito
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot--unlocks"></div>
+      Desbloqueia
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot legend-dot--done"></div>
+      Cursada ✓
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <label for="curriculum-select">Grade:</label>
+  <select class="flow-select" id="curriculum-select">
+    <option value="sistemas-eletronicos">Sistemas Eletrônicos</option>
+    <option value="sistemas-potencia">Sistemas de Potência</option>
+    <option value="robotica-automacao">Robótica e Automação Industrial</option>
+    <option value="energia">Energia</option>
+    <option value="engenharia-computacional">Engenharia Computacional</option>
+    <option value="ciencia-computacao-integral">Ciência da Computação (Integral)</option>
+    <option value="ciencia-computacao-noturno">Ciência da Computação (Noturno)</option>
+  </select>
+  <div class="sep"></div>
+  <label>Mostrar setas:</label>
+  <button class="btn-toggle active" id="btn-arrows" type="button">Ativado</button>
+  <div class="sep"></div>
+  <label>Modo:</label>
+  <button class="btn-toggle active" id="btn-mode-nav" type="button">Navegar</button>
+  <button class="btn-toggle" id="btn-mode-mark" type="button">Marcar cursadas</button>
+  <div class="info-bar" id="info-bar">Clique em uma disciplina</div>
+</div>
+
+<div class="flow-scroll">
+  <div class="flow-grid" id="flow-grid">
+    <svg class="arrows-svg" id="arrows-svg"></svg>
+  </div>
+</div>
+
+<div class="flow-scrollbar-shell" id="flow-scrollbar-shell" hidden>
+  <div class="flow-scrollbar" id="flow-scrollbar" aria-hidden="true">
+    <div class="flow-scrollbar-fill" id="flow-scrollbar-fill"></div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <span>Disciplinas cursadas: <strong id="done-count">0</strong> / <strong id="total-count">0</strong></span>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <span id="credits-done">0 créditos concluídos</span>
+  <button class="btn-reset" id="btn-reset" type="button">Resetar progresso</button>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="../assets/js/pages/fluxo-data.js?v=20260409a" defer></script>
+<script src="../assets/js/pages/fluxo.js?v=20260409a" defer></script>
+</body>
+</html>

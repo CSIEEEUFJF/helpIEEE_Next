@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" fill="none">
+  <path d="M16 102H76L94 68H136L154 102H216L232 54H274L290 102H344" stroke="#9AD2FF" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M56 86V118" stroke="#D4EDFF" stroke-width="2"/>
+  <path d="M176 86V118" stroke="#D4EDFF" stroke-width="2"/>
+  <path d="M306 86V118" stroke="#D4EDFF" stroke-width="2"/>
+  <path d="M86 42C98 28 110 26 122 42C134 58 146 56 158 42C170 28 182 26 194 42C206 58 218 56 230 42" stroke="#7ABEFF" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="94" cy="68" r="6" fill="#7ABEFF"/>
+  <circle cx="232" cy="54" r="6" fill="#7ABEFF"/>
+  <text x="252" y="42" fill="#7ABEFF" font-family="Open Sans, Arial, sans-serif" font-size="26" font-weight="700">AC</text>
+</svg>

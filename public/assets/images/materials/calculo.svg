@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" fill="none">
+  <path d="M0 110C36 92 72 75 108 78C144 81 180 112 216 110C252 108 288 72 324 58C338 52 349 50 360 50" stroke="#93D0FF" stroke-width="3"/>
+  <path d="M0 122H360" stroke="#D2ECFF" stroke-width="2"/>
+  <path d="M48 16V136" stroke="#D2ECFF" stroke-width="2"/>
+  <path d="M96 16V136" stroke="#E4F4FF" stroke-width="1.5"/>
+  <path d="M168 16V136" stroke="#E4F4FF" stroke-width="1.5"/>
+  <path d="M240 16V136" stroke="#E4F4FF" stroke-width="1.5"/>
+  <path d="M312 16V136" stroke="#E4F4FF" stroke-width="1.5"/>
+  <text x="210" y="44" fill="#78BEFF" font-family="Open Sans, Arial, sans-serif" font-size="28" font-weight="700">dy/dx</text>
+  <text x="114" y="72" fill="#A8D9FF" font-family="Open Sans, Arial, sans-serif" font-size="26" font-weight="700">f(x)</text>
+  <text x="250" y="112" fill="#78BEFF" font-family="Open Sans, Arial, sans-serif" font-size="26" font-weight="700">x^2</text>
+</svg>

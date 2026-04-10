@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" fill="none">
+  <defs>
+    <marker id="ga-arrow-v" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M1 1L11 6L1 11V1Z" fill="#6F91FF"/>
+    </marker>
+    <marker id="ga-arrow-r" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M1 1L11 6L1 11V1Z" fill="#94ACFF"/>
+    </marker>
+  </defs>
+  <path d="M42 118L172 46" stroke="#B9CCFF" stroke-width="2"/>
+  <path d="M82 136L212 64" stroke="#D9E6FF" stroke-width="2"/>
+  <path d="M122 146L252 74" stroke="#D9E6FF" stroke-width="2"/>
+  <path d="M28 96L158 24" stroke="#D9E6FF" stroke-width="2"/>
+  <path d="M74 128L74 36" stroke="#C1D4FF" stroke-width="2"/>
+  <path d="M74 128H316" stroke="#C1D4FF" stroke-width="2"/>
+  <path d="M74 128L214 54" stroke="#6F91FF" stroke-width="3" stroke-linecap="round" marker-end="url(#ga-arrow-v)"/>
+  <path d="M74 128L286 94" stroke="#94ACFF" stroke-width="3" stroke-linecap="round" marker-end="url(#ga-arrow-r)"/>
+  <text x="226" y="52" fill="#6F91FF" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700">v</text>
+  <text x="296" y="90" fill="#94ACFF" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700">r</text>
+</svg>

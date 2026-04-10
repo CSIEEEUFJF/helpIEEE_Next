@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 150" fill="none">
+  <path d="M108 44L146 24L184 44V86L146 108L108 86V44Z" stroke="#8FD8C7" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M184 44L230 34L258 58L248 98L206 112L184 86" stroke="#BEEADF" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="108" cy="44" r="6" fill="#5BC0A7"/>
+  <circle cx="146" cy="24" r="6" fill="#5BC0A7"/>
+  <circle cx="184" cy="44" r="6" fill="#5BC0A7"/>
+  <circle cx="184" cy="86" r="6" fill="#5BC0A7"/>
+  <circle cx="146" cy="108" r="6" fill="#5BC0A7"/>
+  <circle cx="108" cy="86" r="6" fill="#5BC0A7"/>
+  <text x="246" y="38" fill="#5BC0A7" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700">H2O</text>
+  <text x="254" y="114" fill="#8FD8C7" font-family="Open Sans, Arial, sans-serif" font-size="24" font-weight="700">pH</text>
+</svg>
