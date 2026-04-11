@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HELPIEEE — Guia do Calouro da Elétrica UFJF</title>
 <link rel="icon" type="image/png" href="assets/images/branding/helpieee-favicon.png">
-<script src="assets/js/theme.js?v=20260328a"></script>
+<script src="assets/js/theme.js?v=20260410e"></script>
 <script>
 (() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -23,7 +23,7 @@
 })();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/pages/home.css?v=20260329c">
+<link rel="stylesheet" href="assets/css/pages/home.css?v=20260410x">
 </head>
 <body class="page-home" id="top">
 <div class="home-intro" id="home-intro" aria-hidden="true">
@@ -44,19 +44,136 @@
     </span>
     <span class="nav-logo-lockup">
       <span class="nav-logo-text">HELPIEEE</span>
-      <span class="nav-logo-meta">Projeto do Ramo Estudantil IEEE UFJF</span>
+      <span class="nav-logo-meta">Projeto da Education Society Ramo IEEE UFJF</span>
     </span>
   </a>
   <ul class="nav-links">
-    <li><a href="#indice">Índice</a></li>
-    <li><a href="#materiais-atalho">Materiais</a></li>
-    <li><a href="#map">Mapa</a></li>
     <li><a href="#fluxo">Fluxo</a></li>
-    <li><a href="#depoimentos">Dicas</a></li>
     <li><a href="pages/primeiros-passos.html" class="nav-cta">Começar →</a></li>
   </ul>
 </nav>
 
+<div class="home-shell">
+  <button
+    type="button"
+    class="home-sidebar__mobile-trigger"
+    id="home-sidebar-mobile-trigger"
+    aria-controls="home-sidebar"
+    aria-expanded="false"
+  >
+    <img src="assets/icons/book.svg" alt="" class="icon-svg icon-svg--button">
+    <span>Atalhos</span>
+  </button>
+
+  <div class="home-sidebar__backdrop" id="home-sidebar-backdrop" hidden></div>
+
+  <aside class="home-sidebar" id="home-sidebar" aria-label="Atalhos rápidos">
+    <div class="home-sidebar__panel">
+      <div class="home-sidebar__header">
+        <div class="home-sidebar__header-copy">
+          <div class="home-sidebar__eyebrow">Acesso rápido</div>
+          <h2 class="home-sidebar__title">Atalhos do HELPIEEE</h2>
+        </div>
+        <button
+          type="button"
+          class="home-sidebar__toggle"
+          id="home-sidebar-toggle"
+          aria-controls="home-sidebar"
+          aria-expanded="true"
+          aria-label="Recolher atalhos"
+        >
+          <span class="home-sidebar__toggle-bar"></span>
+          <span class="home-sidebar__toggle-bar"></span>
+        </button>
+      </div>
+
+      <p class="home-sidebar__desc">Abra a página certa sem rolar a home inteira.</p>
+
+      <a href="pages/materiais.html" class="home-sidebar__spotlight" id="materiais-atalho" title="Materiais do 1º período">
+        <span class="home-sidebar__spotlight-icon">
+          <img src="assets/icons/book.svg" alt="" class="icon-svg">
+        </span>
+        <span class="home-sidebar__spotlight-copy">
+          <span class="home-sidebar__spotlight-kicker">Mais acessado</span>
+          <span class="home-sidebar__spotlight-title">Materiais do 1º período</span>
+          <span class="home-sidebar__spotlight-desc">Páginas das disciplinas, trilhas de estudo e apoio em um só lugar.</span>
+        </span>
+        <span class="home-sidebar__spotlight-cta">Abrir</span>
+      </a>
+
+      <div class="home-sidebar__group">
+        <div class="home-sidebar__group-label">Começo do curso</div>
+        <div class="home-sidebar__links">
+          <a href="pages/primeiros-passos.html" class="home-sidebar__link" title="Primeiros Passos">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/document.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">Primeiros Passos</span>
+              <span class="home-sidebar__link-meta">internet, RU, laboratórios e começo do semestre</span>
+            </span>
+          </a>
+
+          <a href="pages/faculdade.html" class="home-sidebar__link" title="Funcionamento da Faculdade">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/faculty.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">Funcionamento da Faculdade</span>
+              <span class="home-sidebar__link-meta">SIGA, IRA, RAG, glossário e regras da vida acadêmica</span>
+            </span>
+          </a>
+
+          <a href="pages/fluxo.html" class="home-sidebar__link" title="Fluxo Curricular">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/blueprint.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">Fluxo Curricular</span>
+              <span class="home-sidebar__link-meta">pré-requisitos, grades e visão de longo prazo do curso</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="home-sidebar__group">
+        <div class="home-sidebar__group-label">Rede, oportunidades e projeto</div>
+        <div class="home-sidebar__links">
+          <a href="pages/comunidade.html" class="home-sidebar__link" title="Comunidade">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/community.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">Comunidade</span>
+              <span class="home-sidebar__link-meta">apoio, grupos, monitoria e rotina com outras pessoas</span>
+            </span>
+          </a>
+
+          <a href="pages/ieee.html" class="home-sidebar__link" title="IEEE & Oportunidades">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/circuit.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">IEEE & Oportunidades</span>
+              <span class="home-sidebar__link-meta">capítulos, equipes, eventos e portas de entrada</span>
+            </span>
+          </a>
+
+          <a href="pages/sobre-nos.html" class="home-sidebar__link" title="Sobre Nós">
+            <span class="home-sidebar__icon">
+              <img src="assets/icons/engineering.svg" alt="" class="icon-svg">
+            </span>
+            <span class="home-sidebar__link-copy">
+              <span class="home-sidebar__link-title">Sobre Nós</span>
+              <span class="home-sidebar__link-meta">propósito, projeto e jeito de usar o HELPIEEE</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="home-main">
 <!-- HERO -->
 <div class="hero">
   <div class="hero-glow"></div>
@@ -70,11 +187,11 @@
         </span>
       </div>
       <h3 class="hero-float-title">Materiais do 1º período</h3>
-      <p class="hero-float-desc">Páginas das disciplinas, resumos e provas antigas em um só lugar.</p>
+      <p class="hero-float-desc">Páginas das disciplinas, trilhas de estudo e apoio em um só lugar.</p>
       <div class="hero-float-tags" aria-hidden="true">
         <span class="hero-float-tag">Algoritmos</span>
         <span class="hero-float-tag">Cálculo I</span>
-        <span class="hero-float-tag">Provas antigas</span>
+        <span class="hero-float-tag">Rotina de estudo</span>
       </div>
       <span class="hero-float-link" aria-hidden="true">Ver materiais →</span>
     </a>
@@ -107,7 +224,7 @@
   </div>
 
   <div class="hero-content">
-    <div class="hero-tag">Projeto do Ramo Estudantil IEEE UFJF</div>
+      <div class="hero-tag">Projeto da Education Society Ramo IEEE UFJF</div>
 
     <h1 class="hero-title">
       Bem-vindo à<br>
@@ -122,97 +239,22 @@
 
     <div class="hero-buttons">
       <a href="pages/primeiros-passos.html" class="btn-primary">Explorar o guia →</a>
-      <a href="#indice" class="btn-secondary">Índice rápido</a>
+      <button type="button" class="btn-secondary btn-secondary--sidebar" id="hero-sidebar-trigger">Atalhos rápidos</button>
     </div>
   </div>
 
 </div>
-
-<!-- QUICK INDEX -->
-<section class="guide-index" id="indice">
-  <div class="guide-index-inner">
-    <div class="section-label reveal">Acesso rápido</div>
-    <h2 class="section-title reveal">Já sabe o que precisa?</h2>
-    <p class="section-desc reveal">Se você já sabe o que quer abrir, use este mapa rápido do projeto inteiro para pular direto para a página certa.</p>
-
-    <a href="pages/materiais.html" class="index-spotlight reveal" id="materiais-atalho" aria-label="Abrir biblioteca de materiais">
-      <div class="index-spotlight-icon">
-        <img src="assets/icons/book.svg" alt="" class="icon-svg">
-      </div>
-      <div class="index-spotlight-copy">
-        <span class="index-spotlight-kicker">Biblioteca de materiais</span>
-        <h3 class="index-spotlight-title">Todas as páginas das disciplinas do 1º período.</h3>
-        <p class="index-spotlight-desc">Entre por aqui para abrir a visão geral das matérias, chegar nas páginas específicas e acessar provas antigas sem precisar caçar links pela home.</p>
-        <div class="index-spotlight-tags" aria-hidden="true">
-          <span class="index-spotlight-tag">Algoritmos</span>
-          <span class="index-spotlight-tag">Cálculo I</span>
-          <span class="index-spotlight-tag">Geometria Analítica</span>
-          <span class="index-spotlight-tag">Provas antigas</span>
-        </div>
-      </div>
-      <span class="index-spotlight-cta">Abrir materiais →</span>
-    </a>
-
-    <div class="index-groups reveal">
-      <div class="index-group">
-        <div class="index-group-title">Começo e campus</div>
-        <div class="index-list">
-          <a href="pages/primeiros-passos.html" class="index-link">
-            <span class="index-link-title">Primeiros Passos</span>
-            <span class="index-link-meta">internet, RU, laboratórios e começo do semestre</span>
-          </a>
-          <a href="pages/faculdade.html" class="index-link">
-            <span class="index-link-title">Funcionamento da Faculdade</span>
-            <span class="index-link-meta">SIGA, IRA, RAG, glossário e regras da vida acadêmica</span>
-          </a>
-          <a href="pages/mapa.html" class="index-link">
-            <span class="index-link-title">Mapa do Campus</span>
-            <span class="index-link-meta">salas, blocos, serviços e rota do primeiro dia</span>
-          </a>
-          <a href="pages/fluxo.html" class="index-link">
-            <span class="index-link-title">Fluxo Curricular</span>
-            <span class="index-link-meta">pré-requisitos, grades e visão de longo prazo do curso</span>
-          </a>
-        </div>
-      </div>
-
-      <div class="index-group">
-        <div class="index-group-title">Rede e oportunidades</div>
-        <div class="index-list">
-          <a href="pages/comunidade.html" class="index-link">
-            <span class="index-link-title">Comunidade</span>
-            <span class="index-link-meta">apoio, grupos, monitoria e rotina com outras pessoas</span>
-          </a>
-          <a href="pages/ieee.html" class="index-link">
-            <span class="index-link-title">IEEE & Oportunidades</span>
-            <span class="index-link-meta">capítulos, equipes, eventos e portas de entrada</span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- FEATURES -->
 <div class="features-section" id="features">
   <div class="features-inner">
     <div class="section-label reveal">O que você encontra</div>
     <h2 class="section-title reveal">Tudo que você precisa<br>no primeiro semestre.</h2>
-    <p class="section-desc reveal">Do mapa de salas às resoluções de G.A. — organizamos tudo para você não se perder (nem no campus, nem nas matérias).</p>
+    <p class="section-desc reveal">Dos materiais do 1º período ao fluxo curricular — organizamos tudo para você não se perder nas matérias nem na rotina do começo do curso.</p>
 
     <div class="features-grid reveal">
-      <a href="pages/mapa.html" class="feature-card" aria-label="Abrir página Mapa de Salas">
-        <span class="feature-num">01</span>
-        <div class="feature-icon">
-          <img src="assets/icons/map.svg" alt="" class="icon-svg">
-        </div>
-        <div class="feature-title">Mapa de Salas</div>
-        <p class="feature-desc">Encontre qualquer sala, laboratório, coordenação ou serviço na UFJF com nosso mapa interativo do campus e dos blocos de Engenharia.</p>
-        <span class="feature-link" aria-hidden="true">Ver mapa →</span>
-      </a>
-
       <a href="pages/primeiros-passos.html" class="feature-card" aria-label="Abrir página Primeiros Passos">
-        <span class="feature-num">02</span>
+        <span class="feature-num">01</span>
         <div class="feature-icon">
           <img src="assets/icons/document.svg" alt="" class="icon-svg">
         </div>
@@ -222,7 +264,7 @@
       </a>
 
       <a href="pages/fluxo.html" class="feature-card" aria-label="Abrir página do fluxo curricular">
-        <span class="feature-num">03</span>
+        <span class="feature-num">02</span>
         <div class="feature-icon">
           <img src="assets/icons/blueprint.svg" alt="" class="icon-svg">
         </div>
@@ -232,7 +274,7 @@
       </a>
 
       <a href="pages/faculdade.html" class="feature-card" aria-label="Abrir página sobre o funcionamento da faculdade">
-        <span class="feature-num">04</span>
+        <span class="feature-num">03</span>
         <div class="feature-icon">
           <img src="assets/icons/faculty.svg" alt="" class="icon-svg">
         </div>
@@ -242,7 +284,7 @@
       </a>
 
       <a href="pages/ieee.html" class="feature-card" aria-label="Abrir página do IEEE UFJF">
-        <span class="feature-num">05</span>
+        <span class="feature-num">04</span>
         <div class="feature-icon">
           <img src="assets/icons/circuit.svg" alt="" class="icon-svg">
         </div>
@@ -252,7 +294,7 @@
       </a>
 
       <a href="pages/comunidade.html" class="feature-card" aria-label="Abrir página da comunidade">
-        <span class="feature-num">06</span>
+        <span class="feature-num">05</span>
         <div class="feature-icon">
           <img src="assets/icons/community.svg" alt="" class="icon-svg">
         </div>
@@ -261,54 +303,49 @@
         <span class="feature-link" aria-hidden="true">Entrar na comunidade →</span>
       </a>
     </div>
-  </div>
-</div>
 
-<!-- MAP SECTION -->
-<div class="map-section" id="map">
-  <div class="map-inner">
-    <div class="map-content">
-      <div class="section-label reveal">Orientação no campus</div>
-      <h2 class="section-title reveal">Não se perca<br>no campus.</h2>
-      <p class="section-desc reveal">Mapa interativo dos blocos de Engenharia da UFJF — encontre salas, labs, coordenação e serviços em segundos.</p>
-
-      <ul class="map-features reveal">
-        <li class="map-feat-item">
-          <div class="map-feat-icon">
-            <img src="assets/icons/faculty.svg" alt="" class="icon-svg icon-svg--map">
-          </div>
-          <span>Mapa completo dos blocos A, B, C, D, E e F da Engenharia</span>
-        </li>
-        <li class="map-feat-item">
-          <div class="map-feat-icon">
-            <img src="assets/icons/microscope.svg" alt="" class="icon-svg icon-svg--map">
-          </div>
-          <span>Localização de todos os laboratórios e suas especialidades</span>
-        </li>
-        <li class="map-feat-item">
-          <div class="map-feat-icon">
-            <img src="assets/icons/pin.svg" alt="" class="icon-svg icon-svg--map">
-          </div>
-          <span>Coordenação, RU, biblioteca, reprografia e serviços essenciais</span>
-        </li>
-        <li class="map-feat-item">
-          <div class="map-feat-icon">
-            <img src="assets/icons/bus.svg" alt="" class="icon-svg icon-svg--map">
-          </div>
-          <span>Pontos de ônibus, estacionamentos e rotas dentro do campus</span>
-        </li>
-      </ul>
-
-      <a href="pages/mapa.html" class="btn-secondary btn-secondary-inverse map-button">Abrir mapa completo →</a>
-    </div>
-
-    <div class="map-visual map-visual--frame reveal">
-      <iframe
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-43.3750%2C-21.7820%2C-43.3630%2C-21.7730&layer=mapnik&marker=-21.7776%2C-43.3690"
-        class="map-visual-frame"
-        title="Campus UFJF"
-        loading="lazy"
-      ></iframe>
+    <div class="visitor-route reveal" aria-label="Fluxo sugerido de navegação">
+      <div class="visitor-route__header">
+        <div class="visitor-route__kicker">Fluxo sugerido de navegação</div>
+        <p class="visitor-route__desc">Se você chegou agora, este é o caminho mais útil para não abrir tudo ao mesmo tempo.</p>
+      </div>
+      <div class="visitor-route__steps">
+        <a href="pages/primeiros-passos.html" class="visitor-route__step">
+          <span class="visitor-route__step-num">1</span>
+          <span class="visitor-route__step-copy">
+            <strong>Primeiros Passos</strong>
+            <small>Resolva internet, RU, laboratórios e o básico da chegada.</small>
+          </span>
+        </a>
+        <a href="pages/faculdade.html" class="visitor-route__step">
+          <span class="visitor-route__step-num">2</span>
+          <span class="visitor-route__step-copy">
+            <strong>Faculdade</strong>
+            <small>Entenda SIGA, IRA, matrícula e a lógica da rotina acadêmica.</small>
+          </span>
+        </a>
+        <a href="pages/materiais.html" class="visitor-route__step">
+          <span class="visitor-route__step-num">3</span>
+          <span class="visitor-route__step-copy">
+            <strong>Materiais</strong>
+            <small>Monte sua base de estudo nas disciplinas do primeiro período.</small>
+          </span>
+        </a>
+        <a href="pages/fluxo.html" class="visitor-route__step">
+          <span class="visitor-route__step-num">4</span>
+          <span class="visitor-route__step-copy">
+            <strong>Fluxo</strong>
+            <small>Olhe os pré-requisitos e a visão de longo prazo do curso.</small>
+          </span>
+        </a>
+        <a href="pages/comunidade.html" class="visitor-route__step">
+          <span class="visitor-route__step-num">5</span>
+          <span class="visitor-route__step-copy">
+            <strong>Comunidade e IEEE</strong>
+            <small>Depois entre em grupos, projetos, capítulos e oportunidades.</small>
+          </span>
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -323,67 +360,31 @@
     </div>
   </div>
   <div class="fluxo-embed reveal">
+      <div class="fluxo-preview-frame">
+        <a href="pages/fluxo.html" class="fluxo-preview-link" aria-label="Abrir a página completa do fluxo curricular">
+          <span class="fluxo-preview-link__chip">Abrir fluxo completo</span>
+        </a>
       <iframe
-        src="pages/fluxo.html?v=20260329a"
+                  src="pages/fluxo.html?embed=home&v=20260410u"
         id="fluxo-iframe"
         class="fluxo-iframe"
         title="Fluxo Curricular Interativo"
+        tabindex="-1"
         loading="lazy"
       ></iframe>
+      </div>
     <p class="fluxo-note">
-      Fluxo interativo com seleção entre Sistemas Eletrônicos, Sistemas de Potência, Robótica e Energia.
+      Fluxo interativo com Engenharia Elétrica, Engenharia Computacional, Ciência da Computação, Sistemas de Informação e outras grades da UFJF.
     </p>
   </div>
 </div>
-
-<!-- DICAS / DEPOIMENTOS -->
-<section id="depoimentos">
-  <div class="section-label reveal">Dicas de quem passou por isso</div>
-  <h2 class="section-title reveal">Conselhos reais<br>de veteranos.</h2>
-  <p class="section-desc reveal">Quem já viveu o primeiro semestre deixou dicas para você não cometer os mesmos erros.</p>
-
-  <div class="info-cards reveal">
-    <div class="info-card">
-      <p class="info-quote">"Não deixa Cálculo acumular. Faz lista todo dia, mesmo que seja pouco. E vai às monitorias — elas salvam vidas (e reprovações)."</p>
-      <div class="info-author">
-        <div class="info-avatar">MR</div>
-        <div>
-          <div class="info-name">Mateus R.</div>
-          <div class="info-role">5º período · Eng. Elétrica UFJF</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <p class="info-quote">"Aproveite para entrar no IEEE desde o primeiro período. As conexões e projetos que você faz lá dentro fazem uma diferença enorme no currículo e na carreira."</p>
-      <div class="info-author">
-        <div class="info-avatar">AC</div>
-        <div>
-          <div class="info-name">Ana C.</div>
-          <div class="info-role">7º período · Membro IEEE UFJF</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-card">
-      <p class="info-quote">"G.A. parece abstrata mas tem padrão nas provas. Resolve as provas antigas do HELPIEEE e você vai ver que os professores repetem muito os tipos de questão."</p>
-      <div class="info-author">
-        <div class="info-avatar">LF</div>
-        <div>
-          <div class="info-name">Lucas F.</div>
-          <div class="info-role">4º período · Eng. Elétrica UFJF</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- IEEE SECTION -->
 <div class="ieee-section" id="ieee">
   <div class="ieee-inner reveal">
     <div class="ieee-text">
-      <h3>Uma iniciativa do Ramo Estudantil IEEE UFJF</h3>
-      <p>O HELPIEEE é um projeto de acolhimento criado pelo Ramo Estudantil IEEE UFJF. O guia tem identidade própria, mas nasce da vontade do ramo de facilitar o começo do curso, conectar calouros a oportunidades e transformar a chegada à faculdade em algo menos caótico.</p>
+      <h3>Uma iniciativa da EdSoc</h3>
+      <p>O HELPIEEE é um projeto de acolhimento criado pela EdSoc. O guia tem identidade própria, mas nasce da vontade de facilitar o começo do curso, conectar calouros a oportunidades e transformar a chegada à faculdade em algo menos caótico.</p>
     </div>
     <div class="ieee-badge-group">
       <div class="ieee-badge">
@@ -409,9 +410,9 @@
       <img src="assets/icons/book.svg" alt="" class="icon-svg icon-svg--button">
       Ir para materiais
     </a>
-    <a href="pages/mapa.html" class="btn-outline-white">
-      <img src="assets/icons/map.svg" alt="" class="icon-svg icon-svg--button icon-svg--button-light">
-      Explorar o mapa
+    <a href="pages/fluxo.html" class="btn-outline-white">
+      <img src="assets/icons/blueprint.svg" alt="" class="icon-svg icon-svg--button icon-svg--button-light">
+      Abrir o fluxo
     </a>
   </div>
 </div>
@@ -423,18 +424,24 @@
       <div class="footer-logo">
         <div class="footer-logo-text">HELPIEEE</div>
       </div>
-      <div class="footer-sub">Projeto do Ramo Estudantil IEEE UFJF · Juiz de Fora, MG</div>
+      <div class="footer-sub">Projeto da Education Society Ramo IEEE UFJF · Juiz de Fora, MG</div>
     </div>
     <ul class="footer-links">
       <li><a href="#materiais-atalho">Materiais</a></li>
-      <li><a href="pages/mapa.html">Mapa</a></li>
+      <li><a href="pages/fluxo.html">Fluxo</a></li>
+      <li><a href="pages/sobre-nos.html">Sobre Nós</a></li>
       <li><a href="pages/ieee.html">Sobre o IEEE</a></li>
       <li><a href="pages/primeiros-passos.html">Começar</a></li>
     </ul>
     <div class="footer-copy">© 2026 IEEE · All rights reserved.</div>
   </div>
 </footer>
+  </div>
+</div>
 
-<script src="assets/js/pages/home.js?v=20260329c" defer></script>
+<script src="assets/js/pages/home.js?v=20260410u" defer></script>
 </body>
 </html>
+
+
+

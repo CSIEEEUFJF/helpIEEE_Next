@@ -62,8 +62,37 @@ const stickyScrollbarShell = document.getElementById('flow-scrollbar-shell');
 const stickyScrollbar = document.getElementById('flow-scrollbar');
 const stickyScrollbarFill = document.getElementById('flow-scrollbar-fill');
 const bottomBar = document.querySelector('.bottom-bar');
+const bodyElement = document.body;
+const flowUrlParams = new URLSearchParams(window.location.search);
+const isHomeEmbed = flowUrlParams.get('embed') === 'home';
 const infoBar = document.getElementById('info-bar');
 const curriculumSelect = document.getElementById('curriculum-select');
+const topbarNav = document.querySelector('.topbar-nav');
+const searchHighlightDuration = 1800;
+const pageSidebarStorageKey = 'helpieee-site-sidebar-collapsed';
+const legacySidebarStorageKey = 'helpieee-home-sidebar-collapsed';
+const sidebarTooltipHideDelay = 120;
+
+const flowSidebarSpotlightRoute = {
+  href: 'materiais.html',
+  label: 'Materiais do 1º período',
+  meta: 'Páginas das disciplinas, trilhas de estudo e apoio em um só lugar.',
+  icon: '../assets/icons/book.svg',
+  kicker: 'Mais acessado',
+  cta: 'Abrir'
+};
+
+const flowPrimaryRoutes = [
+  { href: 'primeiros-passos.html', label: 'Primeiros Passos', meta: 'internet, RU, laboratórios e começo do semestre', icon: '../assets/icons/document.svg' },
+  { href: 'faculdade.html', label: 'Funcionamento da Faculdade', meta: 'SIGA, IRA, RAG, glossário e regras da vida acadêmica', icon: '../assets/icons/faculty.svg' },
+  { href: 'fluxo.html', label: 'Fluxo Curricular', meta: 'pré-requisitos, grades e visão de longo prazo do curso', icon: '../assets/icons/blueprint.svg', current: true }
+];
+
+const flowSecondaryRoutes = [
+  { href: 'comunidade.html', label: 'Comunidade', meta: 'apoio, grupos, monitoria e rotina com outras pessoas', icon: '../assets/icons/community.svg' },
+  { href: 'ieee.html', label: 'IEEE & Oportunidades', meta: 'capítulos, equipes, eventos e portas de entrada', icon: '../assets/icons/circuit.svg' },
+  { href: 'sobre-nos.html', label: 'Sobre Nós', meta: 'propósito, projeto e jeito de usar o HELPIEEE', icon: '../assets/icons/engineering.svg' }
+];
 
 let activeCurriculumKey = curriculumSelect?.value || Object.keys(curricula)[0];
 let activeCurriculum = curricula[activeCurriculumKey];
@@ -73,6 +102,872 @@ let mode = 'navigate';
 let doneSet = new Set();
 let rafId;
 let syncingStickyScrollbar = false;
+let highlightedSearchDisc = null;
+let highlightedSearchTimer = 0;
+
+if (topbarNav) {
+  topbarNav.innerHTML = '';
+}
+
+if (isHomeEmbed && bodyElement) {
+  bodyElement.classList.add('flow-embed-home');
+}
+
+function readSavedSidebarState() {
+  try {
+    const savedState = window.localStorage.getItem(pageSidebarStorageKey);
+
+    if (savedState === 'true' || savedState === 'false') {
+      return savedState === 'true';
+    }
+
+    return window.localStorage.getItem(legacySidebarStorageKey) === 'true';
+  } catch (error) {
+    return false;
+  }
+}
+
+function persistSidebarState(value) {
+  try {
+    window.localStorage.setItem(pageSidebarStorageKey, String(value));
+  } catch (error) {
+    // Ignore storage failures and keep the state only in memory.
+  }
+}
+
+function initSidebarTooltips(sidebarRoot, compactSidebarQuery) {
+  if (!sidebarRoot || !bodyElement) {
+    return () => {};
+  }
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'page-sidebar-tooltip';
+  tooltip.hidden = true;
+  tooltip.innerHTML = `
+    <div class="page-sidebar-tooltip__title"></div>
+    <div class="page-sidebar-tooltip__meta"></div>
+  `;
+  document.body.appendChild(tooltip);
+
+  const tooltipTitle = tooltip.querySelector('.page-sidebar-tooltip__title');
+  const tooltipMeta = tooltip.querySelector('.page-sidebar-tooltip__meta');
+  let activeTarget = null;
+  let hideTimer = 0;
+
+  const shouldShowTooltip = () => bodyElement.classList.contains('page-sidebar-collapsed') && !compactSidebarQuery.matches;
+
+  const positionTooltip = (target) => {
+    if (!target) {
+      return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    const top = Math.min(Math.max(rect.top + rect.height / 2, 24), window.innerHeight - 24);
+    const maxLeft = Math.max(12, window.innerWidth - tooltip.offsetWidth - 12);
+    const left = Math.min(rect.right + 16, maxLeft);
+
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+  };
+
+  const hideTooltip = () => {
+    activeTarget = null;
+    window.clearTimeout(hideTimer);
+    tooltip.classList.remove('is-visible');
+    hideTimer = window.setTimeout(() => {
+      tooltip.hidden = true;
+    }, sidebarTooltipHideDelay);
+  };
+
+  const showTooltip = (target) => {
+    if (!shouldShowTooltip()) {
+      return;
+    }
+
+    activeTarget = target;
+    window.clearTimeout(hideTimer);
+    tooltipTitle.textContent = target.dataset.tooltip || '';
+    tooltipMeta.textContent = target.dataset.tooltipMeta || '';
+    tooltipMeta.hidden = !target.dataset.tooltipMeta;
+    tooltip.hidden = false;
+    positionTooltip(target);
+
+    requestAnimationFrame(() => {
+      tooltip.classList.add('is-visible');
+    });
+  };
+
+  sidebarRoot.querySelectorAll('.page-sidebar__link[data-tooltip], .page-sidebar__spotlight[data-tooltip]').forEach((link) => {
+    link.addEventListener('mouseenter', () => showTooltip(link));
+    link.addEventListener('mouseleave', hideTooltip);
+    link.addEventListener('focus', () => showTooltip(link));
+    link.addEventListener('blur', hideTooltip);
+  });
+
+  window.addEventListener('scroll', () => {
+    if (activeTarget && shouldShowTooltip()) {
+      positionTooltip(activeTarget);
+    } else if (activeTarget) {
+      hideTooltip();
+    }
+  }, true);
+
+  window.addEventListener('resize', () => {
+    if (activeTarget && shouldShowTooltip()) {
+      positionTooltip(activeTarget);
+    } else if (activeTarget) {
+      hideTooltip();
+    }
+  });
+
+  return () => {
+    if (!shouldShowTooltip()) {
+      hideTooltip();
+    }
+  };
+}
+
+function mountFlowSidebar() {
+  if (!bodyElement || !bodyElement.classList.contains('page-flow')) {
+    return;
+  }
+
+  const sidebarShell = document.createElement('div');
+  sidebarShell.className = 'page-sidebar-shell';
+  sidebarShell.innerHTML = `
+    <button
+      type="button"
+      class="page-sidebar__mobile-trigger"
+      id="page-sidebar-mobile-trigger"
+      aria-controls="page-sidebar"
+      aria-expanded="false"
+    >
+      <span class="page-sidebar__mobile-badge" aria-hidden="true">
+        <img src="../assets/icons/book.svg" alt="" class="icon-svg icon-svg--button">
+      </span>
+      <span>Atalhos</span>
+    </button>
+
+    <div class="page-sidebar__backdrop" id="page-sidebar-backdrop" hidden></div>
+
+    <aside class="page-sidebar" id="page-sidebar" aria-label="Atalhos do HELPIEEE">
+      <div class="page-sidebar__panel">
+        <div class="page-sidebar__header">
+          <div class="page-sidebar__header-copy">
+            <div class="page-sidebar__eyebrow">Navegação lateral</div>
+            <h2 class="page-sidebar__title">Atalhos do HELPIEEE</h2>
+          </div>
+          <button
+            type="button"
+            class="page-sidebar__toggle"
+            id="page-sidebar-toggle"
+            aria-controls="page-sidebar"
+            aria-expanded="true"
+            aria-label="Recolher atalhos"
+          >
+            <span class="page-sidebar__toggle-bar"></span>
+            <span class="page-sidebar__toggle-bar"></span>
+          </button>
+        </div>
+
+        <p class="page-sidebar__desc">Navegue pelo restante do guia sem perder o fluxo curricular de vista.</p>
+
+        <div class="page-sidebar__current">
+          <span class="page-sidebar__group-label">Você está em</span>
+          <strong class="page-sidebar__current-title">Fluxo Curricular</strong>
+          <span class="page-sidebar__current-meta">Pré-requisitos, habilitações e comparação entre grades.</span>
+        </div>
+
+        <nav class="page-sidebar__nav" aria-label="Páginas do guia">
+          <a
+            href="${flowSidebarSpotlightRoute.href}"
+            class="page-sidebar__spotlight"
+            data-tooltip="${flowSidebarSpotlightRoute.label}"
+            data-tooltip-meta="${flowSidebarSpotlightRoute.meta}"
+          >
+            <span class="page-sidebar__spotlight-icon" aria-hidden="true">
+              <img src="${flowSidebarSpotlightRoute.icon}" alt="" class="icon-svg">
+            </span>
+            <span class="page-sidebar__spotlight-copy">
+              <span class="page-sidebar__spotlight-kicker">${flowSidebarSpotlightRoute.kicker}</span>
+              <span class="page-sidebar__spotlight-title">${flowSidebarSpotlightRoute.label}</span>
+              <span class="page-sidebar__spotlight-desc">${flowSidebarSpotlightRoute.meta}</span>
+            </span>
+            <span class="page-sidebar__spotlight-cta">${flowSidebarSpotlightRoute.cta}</span>
+          </a>
+
+          <div class="page-sidebar__group">
+            <div class="page-sidebar__group-label">Começo do curso</div>
+            <div class="page-sidebar__links">
+              ${flowPrimaryRoutes.map((route) => `
+                <a
+                  href="${route.href}"
+                  class="page-sidebar__link${route.current ? ' current' : ''}"
+                  ${route.current ? 'aria-current="page"' : ''}
+                  data-tooltip="${route.label}"
+                  data-tooltip-meta="${route.meta}"
+                >
+                  <span class="page-sidebar__icon" aria-hidden="true">
+                    <img src="${route.icon}" alt="" class="icon-svg">
+                  </span>
+                  <span class="page-sidebar__link-copy">
+                    <span class="page-sidebar__link-title">${route.label}</span>
+                    <span class="page-sidebar__link-meta">${route.meta}</span>
+                  </span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="page-sidebar__group">
+            <div class="page-sidebar__group-label">Rede, oportunidades e projeto</div>
+            <div class="page-sidebar__links">
+              ${flowSecondaryRoutes.map((route) => `
+                <a
+                  href="${route.href}"
+                  class="page-sidebar__link"
+                  data-tooltip="${route.label}"
+                  data-tooltip-meta="${route.meta}"
+                >
+                  <span class="page-sidebar__icon" aria-hidden="true">
+                    <img src="${route.icon}" alt="" class="icon-svg">
+                  </span>
+                  <span class="page-sidebar__link-copy">
+                    <span class="page-sidebar__link-title">${route.label}</span>
+                    <span class="page-sidebar__link-meta">${route.meta}</span>
+                  </span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        </nav>
+      </div>
+    </aside>
+  `;
+
+  document.body.appendChild(sidebarShell);
+  bodyElement.classList.add('has-page-sidebar');
+
+  const pageSidebar = document.getElementById('page-sidebar');
+  const pageSidebarToggle = document.getElementById('page-sidebar-toggle');
+  const pageSidebarBackdrop = document.getElementById('page-sidebar-backdrop');
+  const pageSidebarMobileTrigger = document.getElementById('page-sidebar-mobile-trigger');
+  const compactSidebarQuery = window.matchMedia('(max-width: 1180px)');
+  const syncSidebarTooltips = initSidebarTooltips(pageSidebar, compactSidebarQuery);
+
+  let pageSidebarCollapsed = readSavedSidebarState();
+  let pageSidebarOpen = false;
+
+  const syncPageSidebar = () => {
+    const isCompact = compactSidebarQuery.matches;
+
+    bodyElement.classList.toggle('page-sidebar-collapsed', !isCompact && pageSidebarCollapsed);
+    bodyElement.classList.toggle('page-sidebar-open', isCompact && pageSidebarOpen);
+
+    pageSidebar?.setAttribute('aria-hidden', String(isCompact && !pageSidebarOpen));
+
+    if (pageSidebarToggle) {
+      const expanded = isCompact ? pageSidebarOpen : !pageSidebarCollapsed;
+      pageSidebarToggle.setAttribute('aria-expanded', String(expanded));
+      pageSidebarToggle.setAttribute(
+        'aria-label',
+        isCompact
+          ? (pageSidebarOpen ? 'Fechar atalhos' : 'Abrir atalhos')
+          : (pageSidebarCollapsed ? 'Expandir atalhos' : 'Recolher atalhos'),
+      );
+    }
+
+    if (pageSidebarMobileTrigger) {
+      pageSidebarMobileTrigger.setAttribute('aria-expanded', String(isCompact && pageSidebarOpen));
+    }
+
+    if (pageSidebarBackdrop) {
+      pageSidebarBackdrop.hidden = !(isCompact && pageSidebarOpen);
+    }
+
+    syncSidebarTooltips();
+  };
+
+  const togglePageSidebar = () => {
+    if (compactSidebarQuery.matches) {
+      pageSidebarOpen = !pageSidebarOpen;
+    } else {
+      pageSidebarCollapsed = !pageSidebarCollapsed;
+      persistSidebarState(pageSidebarCollapsed);
+    }
+
+    syncPageSidebar();
+    redrawArrows();
+  };
+
+  const closePageSidebar = () => {
+    if (!compactSidebarQuery.matches) {
+      return;
+    }
+
+    pageSidebarOpen = false;
+    syncPageSidebar();
+  };
+
+  pageSidebarToggle?.addEventListener('click', togglePageSidebar);
+  pageSidebarMobileTrigger?.addEventListener('click', togglePageSidebar);
+  pageSidebarBackdrop?.addEventListener('click', closePageSidebar);
+
+  pageSidebar?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (compactSidebarQuery.matches) {
+        closePageSidebar();
+      }
+    });
+  });
+
+  if (typeof compactSidebarQuery.addEventListener === 'function') {
+    compactSidebarQuery.addEventListener('change', () => {
+      pageSidebarOpen = false;
+      syncPageSidebar();
+      redrawArrows();
+    });
+  } else if (typeof compactSidebarQuery.addListener === 'function') {
+    compactSidebarQuery.addListener(() => {
+      pageSidebarOpen = false;
+      syncPageSidebar();
+      redrawArrows();
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && compactSidebarQuery.matches && pageSidebarOpen) {
+      closePageSidebar();
+    }
+  });
+
+  syncPageSidebar();
+}
+
+function normalizeSearchValue(value) {
+  return (value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, ' e ')
+    .replace(/[º°]/g, ' o ')
+    .replace(/ª/g, ' a ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+const searchArabicToRomanMap = {
+  '1': 'i',
+  '2': 'ii',
+  '3': 'iii',
+  '4': 'iv',
+  '5': 'v',
+  '6': 'vi',
+  '7': 'vii',
+  '8': 'viii',
+  '9': 'ix',
+  '10': 'x',
+};
+
+const searchRomanToArabicMap = Object.fromEntries(
+  Object.entries(searchArabicToRomanMap).map(([arabic, roman]) => [roman, arabic])
+);
+
+function compactSearchValue(value) {
+  return normalizeSearchValue(value).replace(/\s+/g, '');
+}
+
+function remapSearchNumerals(value, replacements) {
+  const normalized = normalizeSearchValue(value);
+
+  if (!normalized) {
+    return '';
+  }
+
+  return normalized
+    .split(' ')
+    .map((token) => replacements[token] || token)
+    .join(' ');
+}
+
+function buildSearchVariants(value) {
+  const normalized = normalizeSearchValue(value);
+
+  if (!normalized) {
+    return [];
+  }
+
+  const arabicVariant = remapSearchNumerals(normalized, searchRomanToArabicMap);
+  const romanVariant = remapSearchNumerals(normalized, searchArabicToRomanMap);
+  const variants = new Set([
+    normalized,
+    arabicVariant,
+    romanVariant,
+    compactSearchValue(normalized),
+    compactSearchValue(arabicVariant),
+    compactSearchValue(romanVariant),
+  ]);
+
+  return Array.from(variants).filter(Boolean);
+}
+
+function buildSearchHaystack(...values) {
+  const variants = new Set();
+
+  values.filter(Boolean).forEach((value) => {
+    buildSearchVariants(value).forEach((variant) => variants.add(variant));
+  });
+
+  return Array.from(variants).join(' ');
+}
+
+function buildSearchQuery(rawValue) {
+  const normalized = normalizeSearchValue(rawValue);
+
+  return {
+    normalized,
+    compact: compactSearchValue(rawValue),
+    tokens: normalized.split(' ').filter(Boolean),
+    variants: buildSearchVariants(rawValue),
+  };
+}
+
+function hasExactSearchVariant(entryVariants, queryVariants) {
+  return queryVariants.some((variant) => entryVariants.includes(variant));
+}
+
+function hasStartsWithSearchVariant(entryVariants, queryVariants) {
+  return queryVariants.some((variant) => variant && entryVariants.some((entryVariant) => entryVariant.startsWith(variant)));
+}
+
+function hasIncludesSearchVariant(entryValue, queryVariants) {
+  return queryVariants.some((variant) => variant && entryValue.includes(variant));
+}
+
+function condenseText(value) {
+  return (value || '').replace(/\s+/g, ' ').trim();
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getSearchSnippetPreview(text, queryTokens) {
+  const plainText = condenseText(text);
+
+  if (!plainText) {
+    return '';
+  }
+
+  if (!queryTokens.length) {
+    return plainText.slice(0, 160);
+  }
+
+  const normalizedText = normalizeSearchValue(plainText);
+  const firstMatchIndex = queryTokens.reduce((bestIndex, token) => {
+    const tokenIndex = normalizedText.indexOf(token);
+
+    if (tokenIndex === -1) {
+      return bestIndex;
+    }
+
+    return bestIndex === -1 ? tokenIndex : Math.min(bestIndex, tokenIndex);
+  }, -1);
+
+  if (firstMatchIndex === -1) {
+    return plainText.slice(0, 160);
+  }
+
+  const previewStart = Math.max(0, firstMatchIndex - 40);
+  const previewEnd = Math.min(plainText.length, previewStart + 168);
+  const preview = plainText.slice(previewStart, previewEnd).trim();
+
+  return `${previewStart > 0 ? '…' : ''}${preview}${previewEnd < plainText.length ? '…' : ''}`;
+}
+
+function buildFlowSearchIndex() {
+  return Object.entries(curricula).flatMap(([curriculumKey, curriculum]) => {
+    const curriculumLabel = curriculum.title.replace(/^Fluxo Curricular\s*—\s*/, '');
+
+    return Object.values(curriculum.discs).map((disc) => {
+      const prereqCodes = disc.prereqs.filter((item) => curriculum.discs[item]);
+      const prereqNames = prereqCodes.map((item) => curriculum.discs[item].name);
+      const unlockCodes = (curriculum.unlocks[disc.code] || []).filter((item) => curriculum.discs[item]);
+      const unlockNames = unlockCodes.map((item) => curriculum.discs[item].name);
+      const snippetParts = [
+        `${disc.period}º período`,
+        `${disc.value} ${curriculum.unitShort}`,
+        prereqNames.length ? `Pré-req: ${prereqNames.slice(0, 2).join(', ')}` : 'Sem pré-requisito direto',
+        unlockNames.length ? `Desbloqueia: ${unlockNames.slice(0, 2).join(', ')}` : '',
+      ].filter(Boolean);
+      const snippet = snippetParts.join(' · ');
+      const fullText = [
+        disc.code,
+        disc.name,
+        curriculumLabel,
+        curriculum.subtitle,
+        `${disc.period} periodo`,
+        `${disc.value} ${curriculum.unitShort} ${curriculum.unitLong}`,
+        prereqCodes.join(' '),
+        prereqNames.join(' '),
+        unlockCodes.join(' '),
+        unlockNames.join(' '),
+      ].join(' ');
+
+      return {
+        curriculumKey,
+        curriculumLabel,
+        code: disc.code,
+        title: disc.name,
+        meta: `${disc.code} · ${curriculumLabel}`,
+        snippet,
+        searchValue: buildSearchHaystack(fullText),
+        titleValue: normalizeSearchValue(disc.name),
+        titleVariants: buildSearchVariants(disc.name),
+        titleSearchValue: buildSearchHaystack(disc.name),
+        codeValue: normalizeSearchValue(disc.code),
+        codeVariants: buildSearchVariants(disc.code),
+        codeSearchValue: buildSearchHaystack(disc.code),
+        metaValue: normalizeSearchValue(`${disc.code} ${curriculumLabel}`),
+        metaSearchValue: buildSearchHaystack(`${disc.code} ${curriculumLabel}`),
+        textValue: normalizeSearchValue(`${snippet} ${curriculum.subtitle} ${prereqNames.join(' ')} ${unlockNames.join(' ')}`),
+        textSearchValue: buildSearchHaystack(`${snippet} ${curriculum.subtitle} ${prereqNames.join(' ')} ${unlockNames.join(' ')}`),
+      };
+    });
+  });
+}
+
+const flowSearchIndex = buildFlowSearchIndex();
+
+function scoreFlowSearchEntry(entry, query) {
+  const { normalized, compact, tokens, variants } = query;
+
+  if (!tokens.length) {
+    return -1;
+  }
+
+  const matchesAllTokens = tokens.every((token) => entry.searchValue.includes(token));
+
+  if (!matchesAllTokens) {
+    return -1;
+  }
+
+  let score = 0;
+  const exactNeedles = compact ? Array.from(new Set([...variants, compact])) : variants;
+
+  if (hasExactSearchVariant(entry.codeVariants, exactNeedles)) {
+    score += 340;
+  } else if (hasStartsWithSearchVariant(entry.codeVariants, exactNeedles)) {
+    score += 240;
+  }
+
+  if (hasExactSearchVariant(entry.titleVariants, exactNeedles)) {
+    score += 300;
+  } else if (hasStartsWithSearchVariant(entry.titleVariants, exactNeedles)) {
+    score += 210;
+  } else if (hasIncludesSearchVariant(entry.titleSearchValue, exactNeedles)) {
+    score += 140;
+  }
+
+  if (hasIncludesSearchVariant(entry.metaSearchValue, exactNeedles) || (normalized && entry.metaValue.includes(normalized))) {
+    score += 70;
+  }
+
+  if (hasIncludesSearchVariant(entry.textSearchValue, exactNeedles) || (normalized && entry.textValue.includes(normalized))) {
+    score += 90;
+  }
+
+  if (entry.curriculumKey === activeCurriculumKey) {
+    score += 36;
+  }
+
+  tokens.forEach((token) => {
+    if (entry.codeSearchValue.startsWith(token) || entry.codeVariants.some((variant) => variant.startsWith(token))) {
+      score += 48;
+    } else if (entry.codeSearchValue.includes(token)) {
+      score += 26;
+    }
+
+    if (entry.titleSearchValue.startsWith(token) || entry.titleVariants.some((variant) => variant.startsWith(token))) {
+      score += 42;
+    } else if (entry.titleSearchValue.includes(token)) {
+      score += 28;
+    }
+
+    if (entry.metaSearchValue.includes(token)) {
+      score += 14;
+    }
+
+    if (entry.textSearchValue.includes(token)) {
+      score += 10;
+    }
+  });
+
+  return score;
+}
+
+function flashDiscTarget(target) {
+  if (!target) {
+    return;
+  }
+
+  if (highlightedSearchDisc && highlightedSearchDisc !== target) {
+    highlightedSearchDisc.classList.remove('disc-search-active');
+  }
+
+  window.clearTimeout(highlightedSearchTimer);
+  highlightedSearchDisc = target;
+  target.classList.add('disc-search-active');
+
+  highlightedSearchTimer = window.setTimeout(() => {
+    target.classList.remove('disc-search-active');
+
+    if (highlightedSearchDisc === target) {
+      highlightedSearchDisc = null;
+    }
+  }, searchHighlightDuration);
+}
+
+function focusDiscipline(code) {
+  if (!activeCurriculum?.discs[code]) {
+    return;
+  }
+
+  selectedCode = code;
+  applyStates();
+  updateInfoBar();
+
+  if (showArrows) {
+    drawArrows();
+  }
+
+  const target = document.getElementById(getDiscId(code));
+
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    flashDiscTarget(target);
+  }
+}
+
+function openFlowSearchResult(result) {
+  if (!result) {
+    return;
+  }
+
+  setMode('navigate');
+
+  if (activeCurriculumKey !== result.curriculumKey) {
+    applyCurriculum(result.curriculumKey);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        focusDiscipline(result.code);
+      });
+    });
+    return;
+  }
+
+  focusDiscipline(result.code);
+}
+
+function mountFlowSearch() {
+  const header = document.querySelector('.site-topbar');
+
+  if (!header) {
+    return;
+  }
+
+  const searchShell = document.createElement('div');
+  searchShell.className = 'site-topbar__search';
+  searchShell.innerHTML = `
+    <div class="flow-search flow-search--topbar">
+      <div class="flow-search__field">
+        <span class="flow-search__icon" aria-hidden="true"></span>
+        <input
+          type="search"
+          class="flow-search__input"
+          id="flow-search-input"
+          placeholder="Buscar disciplina, código ou grade"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button type="button" class="flow-search__clear" id="flow-search-clear" hidden>Limpar</button>
+      </div>
+      <div class="flow-search-results" id="flow-search-results" hidden></div>
+    </div>
+  `;
+
+  if (topbarNav) {
+    header.insertBefore(searchShell, topbarNav);
+  } else {
+    header.appendChild(searchShell);
+  }
+
+  const searchInput = searchShell.querySelector('.flow-search__input');
+  const searchClear = searchShell.querySelector('.flow-search__clear');
+  const searchResults = searchShell.querySelector('.flow-search-results');
+  let activeResults = [];
+  let activeResultIndex = -1;
+
+  const syncActiveResult = () => {
+    searchResults.querySelectorAll('.flow-search-result[data-search-index]').forEach((button) => {
+      const isActive = Number(button.dataset.searchIndex) === activeResultIndex;
+      button.classList.toggle('is-active', isActive);
+
+      if (isActive) {
+        button.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  };
+
+  const setActiveResult = (nextIndex) => {
+    if (!activeResults.length) {
+      activeResultIndex = -1;
+      return;
+    }
+
+    const boundedIndex = (nextIndex + activeResults.length) % activeResults.length;
+    activeResultIndex = boundedIndex;
+    syncActiveResult();
+  };
+
+  const hideResults = () => {
+    activeResults = [];
+    activeResultIndex = -1;
+    searchResults.hidden = true;
+    searchResults.innerHTML = '';
+  };
+
+  const renderResults = (rawQuery) => {
+    const query = buildSearchQuery(rawQuery);
+    const normalizedQuery = query.normalized;
+    const queryTokens = query.tokens;
+
+    searchClear.hidden = !normalizedQuery;
+
+    if (!normalizedQuery) {
+      hideResults();
+      return;
+    }
+
+    activeResults = flowSearchIndex
+      .map((entry) => ({
+        ...entry,
+        score: scoreFlowSearchEntry(entry, query),
+      }))
+      .filter((entry) => entry.score >= 0)
+      .sort((left, right) => right.score - left.score || left.title.localeCompare(right.title, 'pt-BR'))
+      .slice(0, 8)
+      .map((entry) => ({
+        ...entry,
+        preview: getSearchSnippetPreview(entry.snippet, queryTokens),
+      }));
+
+    if (!activeResults.length) {
+      activeResultIndex = -1;
+      searchResults.hidden = false;
+      searchResults.innerHTML = `
+        <div class="flow-search-results__empty">
+          Nenhuma disciplina encontrada. Tente outro nome, código ou grade.
+        </div>
+      `;
+      return;
+    }
+
+    activeResultIndex = 0;
+    searchResults.hidden = false;
+    searchResults.innerHTML = activeResults.map((result, index) => `
+      <button type="button" class="flow-search-result${index === activeResultIndex ? ' is-active' : ''}" data-search-index="${index}">
+        <span class="flow-search-result__eyebrow">${escapeHtml(result.curriculumLabel)}</span>
+        <span class="flow-search-result__title">${escapeHtml(result.title)}</span>
+        <span class="flow-search-result__meta">${escapeHtml(result.meta)}</span>
+        <span class="flow-search-result__snippet">${escapeHtml(result.preview)}</span>
+      </button>
+    `).join('');
+  };
+
+  const openActiveResult = () => {
+    const targetIndex = activeResultIndex >= 0 ? activeResultIndex : 0;
+    const result = activeResults[targetIndex];
+
+    if (!result) {
+      return;
+    }
+
+    openFlowSearchResult(result);
+    hideResults();
+  };
+
+  searchInput.addEventListener('input', (event) => {
+    renderResults(event.target.value);
+  });
+
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim()) {
+      renderResults(searchInput.value);
+    }
+  });
+
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveResult(activeResultIndex < 0 ? 0 : activeResultIndex + 1);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveResult(activeResultIndex < 0 ? activeResults.length - 1 : activeResultIndex - 1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      openActiveResult();
+    } else if (event.key === 'Escape') {
+      hideResults();
+      searchInput.blur();
+    }
+  });
+
+  searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchInput.focus();
+    hideResults();
+    searchClear.hidden = true;
+  });
+
+  searchResults.addEventListener('mousemove', (event) => {
+    const resultButton = event.target.closest('[data-search-index]');
+
+    if (!resultButton) {
+      return;
+    }
+
+    const nextIndex = Number(resultButton.dataset.searchIndex);
+
+    if (nextIndex !== activeResultIndex) {
+      activeResultIndex = nextIndex;
+      syncActiveResult();
+    }
+  });
+
+  searchResults.addEventListener('click', (event) => {
+    const resultButton = event.target.closest('[data-search-index]');
+
+    if (!resultButton) {
+      return;
+    }
+
+    activeResultIndex = Number(resultButton.dataset.searchIndex);
+    openActiveResult();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!searchShell.contains(event.target)) {
+      hideResults();
+    }
+  });
+}
 
 function getCurriculumLabel() {
   return activeCurriculum.title.replace(/^Fluxo Curricular\s*—\s*/, '');
@@ -506,6 +1401,11 @@ function bindControls() {
 }
 
 if (activeCurriculum) {
+  if (!isHomeEmbed) {
+    mountFlowSidebar();
+    mountFlowSearch();
+  }
+
   bindControls();
   applyCurriculum(activeCurriculumKey);
   window.addEventListener('resize', redrawArrows);

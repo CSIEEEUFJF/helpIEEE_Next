@@ -149,7 +149,6 @@ Main routes:
 - `/index.html`
 - `/pages/primeiros-passos.html`
 - `/pages/faculdade.html`
-- `/pages/mapa.html`
 - `/pages/materiais.html`
 - `/pages/materiais-algoritmos.html`
 - `/pages/materiais-calculo.html`

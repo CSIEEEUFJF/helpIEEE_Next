@@ -574,5 +574,256 @@ window.FLOW_CURRICULA = {
         ["DCC205", "Trab. de Conclusão de Curso II", 60, "DCC204"]
       ]
     ]
+  },
+  "engenharia-civil": {
+    title: "Fluxo Curricular — Engenharia Civil",
+    subtitle: "UFJF · currículo 2023/3 · fluxo principal recomendado com estágio e projeto final",
+    unitShort: "h",
+    unitLong: "horas",
+    valueLabel: "Carga",
+    periods: [
+      [
+        ["MAT154", "Cálculo I", 60],
+        ["MAT155", "Geom. Analítica e Sist. Lineares", 60],
+        ["DCC199 / DC5199", "Algoritmos (+ prática)", 90],
+        ["QUI125", "Química Fundamental", 60],
+        ["QUI126", "Lab. de Química", 30],
+        ["FIS122", "Lab. Introd. Ciências Físicas", 30],
+        ["TRN082", "Introd. à Engenharia Civil", 30]
+      ],
+      [
+        ["MAT156", "Cálculo II", 60, "MAT154|MAT155"],
+        ["FIS073", "Física I", 60, "MAT154"],
+        ["FIS077", "Lab. de Física I", 30, "FIS122"],
+        ["EST028", "Introdução à Estatística", 60, "MAT154"],
+        ["QUI168", "Lab. Transformações Químicas", 30, "QUI126"],
+        ["PRT053", "Fund. de Representação Gráfica", 60],
+        ["ESA117", "Engenharia e Meio Ambiente", 30, "QUI125"],
+        ["TRN083", "Contexto e Prática em Eng. Civil", 30, "TRN082"]
+      ],
+      [
+        ["MAT157", "Cálculo III", 60, "MAT156"],
+        ["FIS074", "Física II", 60, "FIS073|MAT154"],
+        ["DCC008", "Cálculo Numérico", 60, "DCC199 / DC5199|MAT156"],
+        ["PHT043", "Fund. em Arquitetura e Urbanismo", 45, "PRT053"],
+        ["CCI064", "Modelagem e Repres. Gráfica", 60, "PRT053"],
+        ["ENE135", "Eletrotécnica", 30, "FIS073|MAT156"],
+        ["ECO034", "Economia", 60, "EST028"]
+      ],
+      [
+        ["MAT029", "Equações Diferenciais I", 60, "MAT156"],
+        ["FIS081", "Fenômenos de Transporte", 60, "FIS074|MAT157"],
+        ["MAC010", "Mecânica", 60, "FIS073|MAT157"],
+        ["AUR064", "Projeto Arquitetônico", 30, "CCI064|PHT043"],
+        ["CCI065", "Gestão de Projetos em Eng. Civil", 60, "CCI064|PHT043"],
+        ["TRN078", "Elementos de Geologia", 45, "ESA117|FIS074"],
+        ["TRN086", "Topografia Geral", 60, "PHT043|TRN083"],
+        ["TRN084", "Práticas de Topografia", 30, "PHT043|TRN083"]
+      ],
+      [
+        ["ETU094", "Análise de Estruturas I", 60, "MAC010"],
+        ["MAC002", "Resistência dos Materiais I", 60, "MAC010|MAT029"],
+        ["ENE037", "Instalações Elétricas Prediais", 60, "ENE135"],
+        ["TRN018 / TRN518", "Mecânica dos Solos I (+ prática)", 75, "MAC010|TRN078"],
+        ["TRN087", "Fund. de Geoprocessamento", 60, "TRN086"],
+        ["CCI009", "Materiais de Const. Civil I", 60, "QUI125|TRN078"]
+      ],
+      [
+        ["ETU095", "Análise de Estruturas II", 60, "ETU094|MAC002"],
+        ["ETU096", "Bases para o Dimens. de Estruturas", 30, "ETU094|MAC002"],
+        ["MAC003", "Resistência dos Materiais II", 60, "MAC002"],
+        ["MAC007", "Lab. Resist. dos Materiais", 30, "MAC002"],
+        ["TRN073", "Introd. aos Sist. de Transportes", 45, "TRN087"],
+        ["TRN019 / TRN519", "Mecânica dos Solos II (+ prática)", 75, "ETU094|MAC002|TRN018 / TRN518"],
+        ["ESA003 / ESA503", "Mecânica dos Fluidos (+ prática)", 75, "FIS081"],
+        ["CCI010 / CCI510", "Materiais de Const. Civil II (+ prática)", 60, "CCI009|MAC002"]
+      ],
+      [
+        ["ETU035", "Estruturas Metálicas", 60, "ETU094|MAC003|MAC007"],
+        ["ETU037", "Concreto Armado I", 60, "ETU094|ETU095|MAC003"],
+        ["TRN029", "Estradas", 45, "TRN019 / TRN519|TRN073"],
+        ["TRN030", "Estudos Hidrológicos e Drenagem", 45, "ESA117|TRN087"],
+        ["TRN074", "Geotecnia de Fundações e Obras", 60, "ESA003 / ESA503|MAC003|TRN019 / TRN519"],
+        ["ESA005", "Mananciais e Qualidade da Água", 30, "ESA117"],
+        ["ESA024 / ESA524", "Hidráulica Geral (+ prática)", 75, "ESA003 / ESA503"]
+      ],
+      [
+        ["ETU017", "Fundações", 60, "ETU037|TRN074"],
+        ["ETU038", "Concreto Armado II", 60, "ETU037"],
+        ["TRN031", "Construção de Estradas I", 30, "TRN029"],
+        ["ESA006", "Saneamento Básico", 60, "ESA005|ESA024 / ESA524"],
+        ["ESA007", "Instalações Hidráulicas Prediais", 60, "AUR064|ESA024 / ESA524"],
+        ["CCI069", "Construção de Edifícios", 60, "AUR064|CCI010 / CCI510"],
+        ["CCI067", "Manutenção de Edifícios", 60, "CCI010 / CCI510"]
+      ],
+      [
+        ["ETU041", "Fund. de Concreto Protendido", 30, "ETU038"],
+        ["TRN075 / TRN575", "Pavimentação (+ prática)", 60, "TRN031"],
+        ["ESA011", "Fund. de Segurança no Trabalho", 30, "CCI069"],
+        ["CCI048", "Programação e Controle de Obras", 60, "CCI069"],
+        ["CAD014", "Administração e Org. de Empresas", 60, "ECO034"],
+        ["EXT067", "Estudos Sociais em Engenharia", 60, "CCI065"],
+        ["PFC-I", "Projeto Final de Curso I", 15, "CCI069|ESA024 / ESA524|ETU037|TRN029"]
+      ],
+      [
+        ["EEC003", "Estágio em Engenharia Civil", 165, "CCI010 / CCI510|ESA003 / ESA503|ETU095|ETU096|MAC003|TRN019 / TRN519|TRN073"],
+        ["PFC-II", "Projeto Final de Curso II", 15, "PFC-I"]
+      ]
+    ]
+  },
+  "telecomunicacoes": {
+    title: "Fluxo Curricular — Eng. Elétrica: Telecomunicações",
+    subtitle: "UFJF · currículo 2023 · Engenharia Elétrica — Telecomunicações (integral)",
+    unitShort: "h",
+    unitLong: "horas",
+    valueLabel: "Carga",
+    periods: [
+      [
+        ["CEL064", "Introdução à Eng. Elétrica", 30],
+        ["FIS122", "Lab. Introd. Ciências Físicas", 30],
+        ["MAT154", "Cálculo I", 60],
+        ["MAT155", "Geom. Analítica e Sist. Lineares", 60],
+        ["QUI125", "Química Fundamental", 60],
+        ["QUI126", "Lab. de Química", 30]
+      ],
+      [
+        ["DCC199 / DC5199", "Algoritmos (+ prática)", 90],
+        ["EST028", "Introdução à Estatística", 60, "MAT154"],
+        ["FIS073", "Física I", 60, "MAT154"],
+        ["FIS077", "Lab. de Física I", 30, "FIS122"],
+        ["MAT156", "Cálculo II", 60, "MAT155|MAT154"],
+        ["MAT158", "Álgebra Linear", 60, "MAT155"]
+      ],
+      [
+        ["CEL032", "Circuitos Lógicos", 60, "DCC199 / DC5199"],
+        ["ENE045", "Lab. de Eletrotécnica", 30, "FIS077|QUI126"],
+        ["EPD097", "Engenharia e Sociedade", 30, "MAT029"],
+        ["ESA002", "Ecologia e Pres. do Ambiente", 30, "QUI125"],
+        ["FIS074", "Física II", 60, "MAT156|FIS073"],
+        ["MAT029", "Equações Diferenciais I", 60, "MAT156"],
+        ["MAT157", "Cálculo III", 60, "MAT156"]
+      ],
+      [
+        ["CEL033", "Circuitos Lineares I", 60, "MAT029|MAT158"],
+        ["DCC008", "Cálculo Numérico", 60, "MAT156|DCC199 / DC5199"],
+        ["ENE131", "Expressão Gráfica", 30],
+        ["ENE140 / EN5140", "Programação p/ Engenharia (+ prática)", 30, "DCC199 / DC5199"],
+        ["FIS075", "Física III", 60, "FIS074|MAT157"],
+        ["FIS081", "Fenômenos de Transporte", 60, "FIS074"],
+        ["MAT030", "Equações Diferenciais II", 60, "MAT029"]
+      ],
+      [
+        ["CEL034", "Circuitos Lineares II", 60, "CEL033|MAT030"],
+        ["CEL065", "Eletromagnetismo", 60, "FIS075|MAT030"],
+        ["CEL066", "Sinais e Sistemas", 60, "MAT030"],
+        ["CEL114 / CE5114", "Eletrônica Analógica I (+ prática)", 60, "ENE045|CEL033|MAT030"],
+        ["CEL117", "Fund. de Sist. Trifásicos", 30, "CEL033"],
+        ["ENE143 / EN5143", "Prog. Avançada e Integ. de Sist. (+ prática)", 60, "ENE140 / EN5140"]
+      ],
+      [
+        ["CEL035", "Eletrônica Digital", 60, "CEL032|CEL114 / CE5114"],
+        ["CEL068", "Princípios de Comunicações", 60, "EST028|CEL066|CEL114 / CE5114"],
+        ["CEL101", "Eletromagnetismo Aplicado", 60, "CEL065|CEL033"],
+        ["CEL112", "Controle de Sist. Dinâmicos I", 60, "CEL034|CEL066"],
+        ["ENE082", "Instalações Elétricas", 60, "ENE131"],
+        ["ENE084", "Análise de Investimentos", 60, "MAT156"],
+        ["ENE125", "Fund. de Conversão Eletromec.", 60, "CEL117"]
+      ],
+      [
+        ["CEL069", "Microprocessadores", 60, "CEL035"],
+        ["CEL086", "Antenas e Propagação", 60, "CEL101"],
+        ["CEL088", "Comunicação Digital", 60, "CEL068"],
+        ["CEL100", "Processamento de Sinais I", 60, "CEL035|CEL066"],
+        ["CEL111", "Lab. de Prototipagem Eletrônica", 30, "CEL035|ENE045|CEL114 / CE5114"],
+        ["CEL120", "Redes de Comunicações I", 60, "CEL035"],
+        ["ENE083", "Fund. Resist. dos Materiais", 30, "DCC008|FIS073"]
+      ],
+      [
+        ["CEL080", "Software Embarcado", 60, "CEL069"],
+        ["CEL119", "Lab. Integrador de Comunicações I", 30, "CEL068"],
+        ["CEL121", "Redes de Comunicações II", 60, "CEL120"],
+        ["CEL123", "Micro-ondas e Circ. de RF", 60, "CEL065|CEL033"],
+        ["EXT014 / EXT514", "Proj. Extensionistas em Sist. Eletr. (+ prática)", 60, "CEL069"]
+      ],
+      [
+        ["CEL106", "Comunicações Ópticas", 60, "CEL101"],
+        ["CEL122", "Sistemas de Telecomunicações", 60, "CEL101|CEL068"],
+        ["CEL124", "Lab. Integrador de Comunicações II", 30, "CEL068"],
+        ["CEL125", "Sist. de Comunicações Móveis", 60, "CEL101|CEL068"],
+        ["EXT015 / EXT515", "Telefonia Digital (+ prática)", 60, "CEL101|CEL068"]
+      ],
+      [
+        ["CEL126", "Trabalho de Conclusão de Curso I", 0],
+        ["EEE002", "Estágio em Engenharia Elétrica", 160],
+        ["CEL127", "Trabalho de Conclusão de Curso II", 0, "CEL126"]
+      ]
+    ]
+  },
+  "sistemas-informacao": {
+    title: "Fluxo Curricular — Sistemas de Informação",
+    subtitle: "UFJF · currículo 2023 · Sistemas de Informação (noturno)",
+    unitShort: "h",
+    unitLong: "horas",
+    valueLabel: "Carga",
+    periods: [
+      [
+        ["DCC133", "Introd. a Sistemas de Informação", 60],
+        ["DCC160", "Lógica e Fund. p/ Computação", 60],
+        ["DCC199 / DC5199", "Algoritmos (+ prática)", 90],
+        ["DCC202", "Desenvolvimento Web", 30],
+        ["MAT155", "Geom. Analítica e Sist. Lineares", 60]
+      ],
+      [
+        ["DCC145", "Aspectos Organizacionais de SI", 60, "DCC133"],
+        ["DCC200 / DC5200", "Algoritmos II (+ prática)", 90, "DCC199 / DC5199"],
+        ["DCC206", "Desenvolvimento Web II", 30, "DCC202"],
+        ["MAT154", "Cálculo I", 60],
+        ["CAD014", "Administração e Org. de Empresas", 60],
+        ["EXT099", "Introdução à Extensão", 60]
+      ],
+      [
+        ["DCC013", "Estrutura de Dados", 60, "DCC200 / DC5200"],
+        ["DCC025", "Orientação a Objetos", 60, "DCC200 / DC5200"],
+        ["MAT156", "Cálculo II", 60, "MAT155|MAT154"],
+        ["DCC207", "Desenvolvimento Web Front-end", 60, "DCC206"],
+        ["DCC203", "Metodologia Científica", 30, "DCC200 / DC5200"]
+      ],
+      [
+        ["DCC012", "Estrutura de Dados II", 60, "DCC013"],
+        ["EST028", "Introdução à Estatística", 60, "MAT154"],
+        ["DCC070", "Organização de Computadores", 60],
+        ["DCC117", "Modelagem de Sistemas", 60, "DCC025"],
+        ["DCC209", "Desenv. p/ Dispositivos Móveis", 60, "DCC207"],
+        ["EADDCC049", "Aspectos Legais da Informática", 60]
+      ],
+      [
+        ["DCC059", "Teoria dos Grafos", 60, "DCC013"],
+        ["DCC060", "Banco de Dados", 60, "DCC012|DCC117"],
+        ["DCC061", "Engenharia de Software", 60, "DCC117"],
+        ["DCC062", "Sistemas Operacionais", 60, "DCC070"],
+        ["FIN001", "Contabilidade Geral e Introd.", 60],
+        ["EADDCC044", "Informática e Sociedade", 30]
+      ],
+      [
+        ["DCC042", "Redes de Computadores", 60, "DCC070"],
+        ["DCC146", "Aspectos Teóricos da Computação", 60, "DCC013|DCC160"],
+        ["DCC174", "Interação Humano-Computador", 60, "DCC061"],
+        ["DCC208", "Desenvolvimento Web Back-end", 60, "DCC206|DCC117"],
+        ["DCC210", "Empreendedorismo Tecnológico", 60, "CAD014|DCC117"]
+      ],
+      [
+        ["DCC014", "Inteligência Artificial", 60, "DCC160|DCC059"],
+        ["DCC077", "Aspectos Avanç. em Banco de Dados", 60, "DCC060"],
+        ["DCC078", "Aspectos Avanç. em Eng. Software", 60, "DCC061"],
+        ["DCC168", "Teste de Software", 60, "DCC061"],
+        ["DCC204", "Trabalho de Conclusão de Curso I", 30, "DCC203"]
+      ],
+      [
+        ["DCC154", "Gerência de Projetos", 60, "DCC061"],
+        ["DCC165", "Segurança e Auditoria de Sistemas", 60, "DCC061"],
+        ["DCC166", "Sistemas de Apoio à Decisão", 60, "DCC014"],
+        ["DCC205", "Trabalho de Conclusão de Curso II", 60, "DCC204"]
+      ]
+    ]
   }
 };

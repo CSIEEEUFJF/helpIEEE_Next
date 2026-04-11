@@ -1,20 +1,31 @@
 (() => {
   const storageKey = 'helpieee-theme';
+  const paletteStorageKey = 'helpieee-palette';
+  // Fallback rapido: troque para 'legacy' se quiser restaurar a paleta antiga sem desfazer CSS.
+  const defaultPalette = 'enhanced';
   const themeRoot = document.documentElement;
   const mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   let manualTheme = null;
+  let manualPalette = null;
 
   try {
     const savedTheme = localStorage.getItem(storageKey);
     if (savedTheme === 'light' || savedTheme === 'dark') {
       manualTheme = savedTheme;
     }
+
+    const savedPalette = localStorage.getItem(paletteStorageKey);
+    if (savedPalette === 'legacy' || savedPalette === 'enhanced') {
+      manualPalette = savedPalette;
+    }
   } catch (error) {
     manualTheme = null;
+    manualPalette = null;
   }
 
   const getSystemTheme = () => (mediaQuery && mediaQuery.matches ? 'dark' : 'light');
   const getActiveTheme = () => manualTheme || getSystemTheme();
+  const getActivePalette = () => manualPalette || defaultPalette;
 
   function updateToggle(theme) {
     const toggle = document.querySelector('[data-theme-toggle]');
@@ -42,6 +53,10 @@
     updateToggle(theme);
   }
 
+  function applyPalette(palette) {
+    themeRoot.dataset.palette = palette;
+  }
+
   function persistTheme(theme) {
     manualTheme = theme;
 
@@ -52,6 +67,18 @@
     }
 
     applyTheme(theme);
+  }
+
+  function persistPalette(palette) {
+    manualPalette = palette;
+
+    try {
+      localStorage.setItem(paletteStorageKey, palette);
+    } catch (error) {
+      // Ignore storage failures and keep the palette in-memory.
+    }
+
+    applyPalette(palette);
   }
 
   function mountToggle() {
@@ -74,10 +101,43 @@
       persistTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
 
-    document.body.appendChild(button);
+    const navContainer = document.querySelector('.topbar-nav, .nav-links');
+
+    if (navContainer?.tagName === 'UL') {
+      const wrapper = document.createElement('li');
+      wrapper.className = 'nav-theme-item';
+      wrapper.appendChild(button);
+      navContainer.appendChild(wrapper);
+    } else if (navContainer) {
+      navContainer.appendChild(button);
+    } else {
+      document.body.appendChild(button);
+    }
+
     updateToggle(getActiveTheme());
   }
 
+  window.HELPIEEE_PALETTE = Object.freeze({
+    useEnhanced() {
+      persistPalette('enhanced');
+    },
+    useLegacy() {
+      persistPalette('legacy');
+    },
+    reset() {
+      manualPalette = null;
+
+      try {
+        localStorage.removeItem(paletteStorageKey);
+      } catch (error) {
+        // Ignore storage failures and fall back to the default palette in-memory.
+      }
+
+      applyPalette(getActivePalette());
+    }
+  });
+
+  applyPalette(getActivePalette());
   applyTheme(getActiveTheme());
 
   if (document.readyState === 'loading') {
