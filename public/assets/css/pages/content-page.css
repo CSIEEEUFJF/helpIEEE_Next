@@ -2731,6 +2731,10 @@ body.page-content.page-sidebar-collapsed .page-sidebar__toggle {
 }
 
 @media (max-width: 720px) {
+  #calendario-academico {
+    display: none;
+  }
+
   .academic-calendar {
     padding: 22px 18px;
   }

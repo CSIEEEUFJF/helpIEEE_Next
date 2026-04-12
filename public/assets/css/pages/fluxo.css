@@ -755,6 +755,8 @@ html {
     scrollbar-gutter: stable;
     scrollbar-width: auto;
     scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
     padding: 32px 40px 48px;
   }
 
@@ -1404,7 +1406,7 @@ html {
     }
 
     .flow-scrollbar-shell {
-      padding-bottom: 6px;
+      display: none;
     }
 
     .flow-grid {

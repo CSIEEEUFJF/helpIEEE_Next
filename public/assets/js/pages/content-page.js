@@ -5,13 +5,12 @@ const legacySidebarStorageKey = 'helpieee-home-sidebar-collapsed';
 const sidebarTooltipHideDelay = 120;
 
 const sidebarSpotlightRoute = {
-  href: 'materiais.html',
-  label: 'Materiais do 1º período',
-  sidebarLabel: 'Materiais do 1º período',
-  file: 'materiais.html',
-  meta: 'Páginas das disciplinas, trilhas de estudo e apoio em um só lugar.',
-  matchPrefix: 'materiais-',
-  icon: '../assets/icons/book.svg',
+  href: 'fluxo.html',
+  label: 'Fluxo Curricular',
+  sidebarLabel: 'Fluxo Curricular',
+  file: 'fluxo.html',
+  meta: 'pré-requisitos, grades e visão de longo prazo do curso',
+  icon: '../assets/icons/blueprint.svg',
   kicker: 'Mais acessado',
   cta: 'Abrir'
 };

@@ -72,12 +72,13 @@ const searchHighlightDuration = 1800;
 const pageSidebarStorageKey = 'helpieee-flow-sidebar-hidden';
 const sidebarTooltipHideDelay = 120;
 const discTooltipHoverQuery = window.matchMedia('(min-width: 901px) and (hover: hover) and (pointer: fine)');
+const directFlowScrollQuery = window.matchMedia('(max-width: 900px), (pointer: coarse)');
 
 const flowSidebarSpotlightRoute = {
-  href: 'materiais.html',
-  label: 'Materiais do 1º período',
-  meta: 'Páginas das disciplinas, trilhas de estudo e apoio em um só lugar.',
-  icon: '../assets/icons/book.svg',
+  href: 'fluxo.html',
+  label: 'Fluxo Curricular',
+  meta: 'pré-requisitos, grades e visão de longo prazo do curso',
+  icon: '../assets/icons/blueprint.svg',
   kicker: 'Mais acessado',
   cta: 'Abrir'
 };
@@ -1106,10 +1107,15 @@ function updateStickyScrollbar() {
   const scrollWidth = Math.max(scrollHost.scrollWidth, scrollHost.clientWidth);
   const bottomBarHeight = bottomBar?.offsetHeight || 0;
   const hasHorizontalOverflow = scrollHost.scrollWidth - scrollHost.clientWidth > 1;
+  const useDirectFlowScroll = directFlowScrollQuery.matches;
 
   stickyScrollbarFill.style.width = `${scrollWidth}px`;
-  stickyScrollbarShell.hidden = !hasHorizontalOverflow;
-  stickyScrollbar.scrollLeft = scrollHost.scrollLeft;
+  stickyScrollbarShell.hidden = useDirectFlowScroll || !hasHorizontalOverflow;
+
+  if (!useDirectFlowScroll) {
+    stickyScrollbar.scrollLeft = scrollHost.scrollLeft;
+  }
+
   document.documentElement.style.setProperty('--bottom-bar-height', `${bottomBarHeight}px`);
 }
 
@@ -1363,7 +1369,7 @@ function redrawArrows() {
 }
 
 function syncHorizontalScroll(source, target) {
-  if (!source || !target || syncingStickyScrollbar) {
+  if (!source || !target || syncingStickyScrollbar || directFlowScrollQuery.matches) {
     return;
   }
 
@@ -1456,8 +1462,14 @@ if (activeCurriculum) {
   bindControls();
   applyCurriculum(activeCurriculumKey);
   window.addEventListener('resize', redrawArrows);
+
+  if (typeof directFlowScrollQuery.addEventListener === 'function') {
+    directFlowScrollQuery.addEventListener('change', redrawArrows);
+  } else if (typeof directFlowScrollQuery.addListener === 'function') {
+    directFlowScrollQuery.addListener(redrawArrows);
+  }
+
   scrollHost?.addEventListener('scroll', () => {
-    redrawArrows();
     syncHorizontalScroll(scrollHost, stickyScrollbar);
   });
 }
