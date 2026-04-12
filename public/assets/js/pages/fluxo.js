@@ -67,6 +67,11 @@ const flowUrlParams = new URLSearchParams(window.location.search);
 const isHomeEmbed = flowUrlParams.get('embed') === 'home';
 const infoBar = document.getElementById('info-bar');
 const curriculumSelect = document.getElementById('curriculum-select');
+const recoveryPlannerSection = document.getElementById('flow-recovery-tool');
+const recoveryPlannerSelect = document.getElementById('recovery-failed-disc');
+const recoveryPlannerButton = document.getElementById('recovery-generate');
+const recoveryPlannerHint = document.getElementById('recovery-course-hint');
+const recoveryPlannerOutput = document.getElementById('recovery-output');
 const topbarNav = document.querySelector('.topbar-nav');
 const searchHighlightDuration = 1800;
 const pageSidebarStorageKey = 'helpieee-flow-sidebar-hidden';
@@ -94,6 +99,9 @@ const flowSecondaryRoutes = [
   { href: 'ieee.html', label: 'IEEE & Oportunidades', meta: 'capítulos, equipes, eventos e portas de entrada', icon: '../assets/icons/circuit.svg' },
   { href: 'sobre-nos.html', label: 'Sobre Nós', meta: 'propósito, projeto e jeito de usar o HELPIEEE', icon: '../assets/icons/engineering.svg' }
 ];
+
+const recoveryPlannerMaxSubjects = 8;
+const recoveryPlannerLookaheadPeriods = 1;
 
 let activeCurriculumKey = curriculumSelect?.value || Object.keys(curricula)[0];
 let activeCurriculum = curricula[activeCurriculumKey];
@@ -1119,6 +1127,268 @@ function updateStickyScrollbar() {
   document.documentElement.style.setProperty('--bottom-bar-height', `${bottomBarHeight}px`);
 }
 
+function getRecoveryPlannerCurriculum() {
+  return activeCurriculum;
+}
+
+function getRecoveryPlannerFirstPeriod() {
+  return getRecoveryPlannerCurriculum()?.periods[1] || [];
+}
+
+function populateRecoveryPlannerOptions(shouldResetSelection = false) {
+  if (!recoveryPlannerSelect) {
+    return;
+  }
+
+  const firstPeriod = getRecoveryPlannerFirstPeriod();
+  const previousValue = recoveryPlannerSelect.value;
+
+  recoveryPlannerSelect.innerHTML = `
+    <option value="">Selecione uma disciplina do 1º período</option>
+    ${firstPeriod.map((disc) => `
+      <option value="${escapeHtml(disc.code)}">${escapeHtml(`${disc.code} — ${disc.name}`)}</option>
+    `).join('')}
+  `;
+
+  if (!shouldResetSelection && firstPeriod.some((disc) => disc.code === previousValue)) {
+    recoveryPlannerSelect.value = previousValue;
+  }
+}
+
+function getRecoveryPlannerEligibleDiscs(curriculum, pendingSet, passedSet, maxPeriod) {
+  return [...pendingSet]
+    .map((code) => curriculum.discs[code])
+    .filter(Boolean)
+    .filter((disc) => disc.period <= maxPeriod && disc.prereqs.every((prereq) => passedSet.has(prereq)));
+}
+
+function compareRecoveryPlannerDiscs(left, right, curriculum, failedCode) {
+  if (left.code === failedCode && right.code !== failedCode) {
+    return -1;
+  }
+
+  if (right.code === failedCode && left.code !== failedCode) {
+    return 1;
+  }
+
+  if (left.period !== right.period) {
+    return left.period - right.period;
+  }
+
+  const unlockDelta = (curriculum.unlocks[right.code]?.length || 0) - (curriculum.unlocks[left.code]?.length || 0);
+
+  if (unlockDelta !== 0) {
+    return unlockDelta;
+  }
+
+  if (left.value !== right.value) {
+    return right.value - left.value;
+  }
+
+  return left.name.localeCompare(right.name, 'pt-BR');
+}
+
+function getRecoveryPlannerDiscNote(disc, suggestedSemester, failedCode) {
+  if (disc.code === failedCode) {
+    return 'Repetição da disciplina reprovada';
+  }
+
+  if (disc.period > suggestedSemester) {
+    return `${disc.period}º período original · disciplina adiantada`;
+  }
+
+  if (disc.period < suggestedSemester) {
+    return `${disc.period}º período original · disciplina reposicionada`;
+  }
+
+  return `${disc.period}º período original`;
+}
+
+function generateRecoveryPlan(failedCode) {
+  const curriculum = getRecoveryPlannerCurriculum();
+  const firstPeriod = getRecoveryPlannerFirstPeriod();
+
+  if (!curriculum || !failedCode) {
+    return null;
+  }
+
+  const failedDisc = curriculum.discs[failedCode];
+  const firstPeriodCodes = firstPeriod.map((disc) => disc.code);
+
+  if (!failedDisc || !firstPeriodCodes.includes(failedCode)) {
+    return null;
+  }
+
+  const passedSet = new Set(firstPeriodCodes.filter((code) => code !== failedCode));
+  const pendingSet = new Set(Object.keys(curriculum.discs).filter((code) => !passedSet.has(code)));
+  const plan = [];
+  let suggestedSemester = 2;
+  let safetyCounter = curriculum.periodCount + 8;
+
+  while (pendingSet.size && safetyCounter > 0) {
+    let maxPeriod = Math.min(curriculum.periodCount, suggestedSemester + recoveryPlannerLookaheadPeriods);
+    let eligible = getRecoveryPlannerEligibleDiscs(curriculum, pendingSet, passedSet, maxPeriod);
+
+    while (!eligible.length && maxPeriod < curriculum.periodCount) {
+      maxPeriod += 1;
+      eligible = getRecoveryPlannerEligibleDiscs(curriculum, pendingSet, passedSet, maxPeriod);
+    }
+
+    if (!eligible.length) {
+      break;
+    }
+
+    const semesterDiscs = eligible
+      .sort((left, right) => compareRecoveryPlannerDiscs(left, right, curriculum, failedCode))
+      .slice(0, recoveryPlannerMaxSubjects);
+
+    plan.push({
+      suggestedSemester,
+      discs: semesterDiscs,
+    });
+
+    semesterDiscs.forEach((disc) => {
+      pendingSet.delete(disc.code);
+      passedSet.add(disc.code);
+    });
+
+    suggestedSemester += 1;
+    safetyCounter -= 1;
+  }
+
+  return {
+    curriculum,
+    failedDisc,
+    firstPeriodPassedCount: firstPeriodCodes.length - 1,
+    totalCourseCount: Object.keys(curriculum.discs).length,
+    plan,
+    unresolved: [...pendingSet].map((code) => curriculum.discs[code]).filter(Boolean),
+  };
+}
+
+function renderRecoveryPlannerOutput() {
+  if (!recoveryPlannerOutput || !recoveryPlannerHint || !recoveryPlannerSelect) {
+    return;
+  }
+
+  const curriculum = getRecoveryPlannerCurriculum();
+  const curriculumLabel = curriculum ? curriculum.title.replace(/^Fluxo Curricular\s*—\s*/, '') : 'esta grade';
+  const firstPeriod = getRecoveryPlannerFirstPeriod();
+  const isAvailable = Boolean(curriculum && firstPeriod.length);
+  const failedCode = recoveryPlannerSelect.value;
+
+  recoveryPlannerSection?.classList.toggle('is-disabled', !isAvailable);
+  recoveryPlannerSelect.disabled = !isAvailable;
+
+  if (recoveryPlannerButton) {
+    recoveryPlannerButton.disabled = !isAvailable || !failedCode;
+  }
+
+  if (!isAvailable) {
+    recoveryPlannerHint.textContent = 'Não foi possível identificar disciplinas obrigatórias do 1º período para esta grade.';
+    recoveryPlannerOutput.innerHTML = `
+      <div class="flow-recovery-empty">
+        O simulador precisa da base do 1º período para montar o plano de recuperação. Se essa grade ainda não tiver essa informação estruturada, o fluxo continua funcionando normalmente, mas esta ferramenta fica indisponível.
+      </div>
+    `;
+    return;
+  }
+
+  recoveryPlannerHint.textContent = `Simulação para uma única reprovação no 1º período da grade ${curriculumLabel}. O algoritmo respeita os pré-requisitos e limita cada semestre a no máximo ${recoveryPlannerMaxSubjects} matérias, adiantando apenas disciplinas que já façam sentido no encadeamento do curso.`;
+
+  if (!failedCode) {
+    recoveryPlannerOutput.innerHTML = `
+      <div class="flow-recovery-empty">
+        Selecione a disciplina reprovada do 1º período para montar a recomendação do 2º semestre em diante.
+      </div>
+    `;
+    return;
+  }
+
+  const planData = generateRecoveryPlan(failedCode);
+
+  if (!planData) {
+    recoveryPlannerOutput.innerHTML = `
+      <div class="flow-recovery-empty">
+        Não foi possível montar a simulação com a disciplina escolhida. Tente selecionar outra matéria do 1º período.
+      </div>
+    `;
+    return;
+  }
+
+  const totalPlannedSubjects = planData.plan.reduce((sum, semester) => sum + semester.discs.length, 0);
+  const lastSuggestedSemester = planData.plan.at(-1)?.suggestedSemester || 1;
+
+  recoveryPlannerOutput.innerHTML = `
+    <div class="flow-recovery-summary">
+      <div class="flow-recovery-summary__intro">
+        <div class="flow-recovery-summary__eyebrow">Cenário simulado</div>
+        <h3 class="flow-recovery-summary__title">${escapeHtml(planData.failedDisc.name)}</h3>
+        <p class="flow-recovery-summary__text">
+          Assumimos aprovação nas outras ${planData.firstPeriodPassedCount} disciplinas do 1º período da grade ${escapeHtml(curriculumLabel)} e montamos a trilha do 2º semestre em diante para reduzir o impacto da reprovação sem passar do teto de ${recoveryPlannerMaxSubjects} matérias por semestre.
+        </p>
+      </div>
+
+      <div class="flow-recovery-stats">
+        <div class="flow-recovery-stat">
+          <span class="flow-recovery-stat__label">Grade analisada</span>
+          <strong class="flow-recovery-stat__value flow-recovery-stat__value--label">${escapeHtml(curriculumLabel)}</strong>
+        </div>
+        <div class="flow-recovery-stat">
+          <span class="flow-recovery-stat__label">Disciplina reprovada</span>
+          <strong class="flow-recovery-stat__value">${escapeHtml(planData.failedDisc.code)}</strong>
+        </div>
+        <div class="flow-recovery-stat">
+          <span class="flow-recovery-stat__label">Semestres sugeridos</span>
+          <strong class="flow-recovery-stat__value">${planData.plan.length}</strong>
+        </div>
+        <div class="flow-recovery-stat">
+          <span class="flow-recovery-stat__label">Último semestre previsto</span>
+          <strong class="flow-recovery-stat__value">${lastSuggestedSemester}º</strong>
+        </div>
+        <div class="flow-recovery-stat">
+          <span class="flow-recovery-stat__label">Matérias planejadas</span>
+          <strong class="flow-recovery-stat__value">${totalPlannedSubjects}/${planData.totalCourseCount - planData.firstPeriodPassedCount}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-recovery-grid">
+      ${planData.plan.map((semester) => `
+        <article class="flow-recovery-term">
+          <div class="flow-recovery-term__header">
+            <div>
+              <div class="flow-recovery-term__eyebrow">${semester.suggestedSemester}º semestre sugerido</div>
+              <h4 class="flow-recovery-term__title">${semester.discs.length} matérias planejadas</h4>
+            </div>
+            <span class="flow-recovery-term__count">${semester.discs.length}/${recoveryPlannerMaxSubjects}</span>
+          </div>
+
+          <ul class="flow-recovery-term__list">
+            ${semester.discs.map((disc) => `
+              <li class="flow-recovery-disc">
+                <span class="flow-recovery-disc__code">${escapeHtml(disc.code)}</span>
+                <span class="flow-recovery-disc__name">${escapeHtml(disc.name)}</span>
+                <span class="flow-recovery-disc__meta">${escapeHtml(getRecoveryPlannerDiscNote(disc, semester.suggestedSemester, planData.failedDisc.code))}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </article>
+      `).join('')}
+    </div>
+
+    ${
+      planData.unresolved.length
+        ? `
+          <div class="flow-recovery-warning">
+            Restaram ${planData.unresolved.length} disciplinas sem encaixe automático. Isso normalmente aponta para um pré-requisito faltando na base ou para uma situação que precisa de análise manual.
+          </div>
+        `
+        : ''
+    }
+  `;
+}
+
 function build() {
   grid.querySelectorAll('.period-col').forEach((element) => element.remove());
 
@@ -1440,7 +1710,9 @@ function applyCurriculum(curriculumKey) {
     curriculumSelect.value = curriculumKey;
   }
 
+  populateRecoveryPlannerOptions(true);
   build();
+  renderRecoveryPlannerOutput();
   notifyParent();
 }
 
@@ -1450,6 +1722,8 @@ function bindControls() {
   document.getElementById('btn-mode-mark')?.addEventListener('click', () => setMode('mark'));
   document.getElementById('btn-reset')?.addEventListener('click', resetDone);
   curriculumSelect?.addEventListener('change', (event) => applyCurriculum(event.target.value));
+  recoveryPlannerSelect?.addEventListener('change', renderRecoveryPlannerOutput);
+  recoveryPlannerButton?.addEventListener('click', renderRecoveryPlannerOutput);
   stickyScrollbar?.addEventListener('scroll', () => syncHorizontalScroll(stickyScrollbar, scrollHost));
 }
 
@@ -1459,6 +1733,7 @@ if (activeCurriculum) {
     mountFlowSearch();
   }
 
+  populateRecoveryPlannerOptions();
   bindControls();
   applyCurriculum(activeCurriculumKey);
   window.addEventListener('resize', redrawArrows);

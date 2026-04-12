@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="../assets/images/branding/helpieee-favicon.png">
 <script src="../assets/js/theme.js?v=20260410e"></script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/pages/fluxo.css?v=20260412c">
+<link rel="stylesheet" href="../assets/css/pages/fluxo.css?v=20260412e">
 </head>
 <body class="page-flow page-sidebar-hidden">
 
@@ -84,6 +84,33 @@
   <div class="info-bar" id="info-bar">Clique em uma disciplina</div>
 </div>
 
+<section class="flow-recovery-tool" id="flow-recovery-tool" aria-labelledby="flow-recovery-title">
+  <div class="flow-recovery-tool__panel">
+    <div class="flow-recovery-tool__intro">
+      <div class="flow-recovery-tool__kicker">Ferramenta em teste</div>
+      <h2 class="flow-recovery-tool__title" id="flow-recovery-title">Plano otimizado após reprovação no 1º período</h2>
+      <p class="flow-recovery-tool__text">Escolha a disciplina reprovada para simular uma sequência de semestres que respeita os pré-requisitos e tenta recuperar tempo sem passar de 8 matérias por período. A recomendação acompanha a grade atualmente selecionada acima.</p>
+    </div>
+
+    <div class="flow-recovery-tool__controls">
+      <div class="flow-recovery-tool__field">
+        <label for="recovery-failed-disc">Disciplina reprovada:</label>
+        <select class="flow-select" id="recovery-failed-disc">
+          <option value="">Selecione uma disciplina do 1º período</option>
+        </select>
+      </div>
+
+      <button class="flow-recovery-tool__button" id="recovery-generate" type="button">Gerar plano sugerido</button>
+    </div>
+
+    <p class="flow-recovery-tool__hint" id="recovery-course-hint">Escolha uma grade e depois selecione a disciplina reprovada do 1º período para gerar a trilha sugerida.</p>
+
+    <div class="flow-recovery-output" id="recovery-output" aria-live="polite">
+      <div class="flow-recovery-empty">Selecione uma disciplina do 1º período para montar a trilha recomendada do 2º semestre em diante.</div>
+    </div>
+  </div>
+</section>
+
 <div class="flow-scroll">
   <div class="flow-grid" id="flow-grid">
     <svg class="arrows-svg" id="arrows-svg"></svg>
@@ -117,7 +144,7 @@
 <div class="tooltip" id="tooltip"></div>
 
 <script src="../assets/js/pages/fluxo-data.js?v=20260411b" defer></script>
-<script src="../assets/js/pages/fluxo.js?v=20260412c" defer></script>
+<script src="../assets/js/pages/fluxo.js?v=20260412e" defer></script>
 </body>
 </html>
 
