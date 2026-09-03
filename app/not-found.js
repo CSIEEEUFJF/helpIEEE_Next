@@ -1,11 +1,5 @@
 import Link from 'next/link';
 
 export default function NotFound() {
-  return (
-    <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Página não encontrada.</h1>
-      <p>Verifique o caminho ou volte para a página inicial do HELPIEEE.</p>
-      <Link href="/index.html">Voltar para o início</Link>
-    </main>
-  );
+  return <div className="not-found"><div><span className="eyebrow">Erro 404</span><h1>Página não encontrada.</h1><p>O endereço pode ter mudado durante a renovação do HELPIEEE.</p><Link className="button button--primary" href="/">Voltar para o início</Link></div></div>;
 }

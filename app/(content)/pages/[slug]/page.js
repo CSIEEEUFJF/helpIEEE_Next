@@ -1,40 +1,17 @@
-import { notFound } from 'next/navigation';
-import { LegacyPageRenderer } from '@/components/LegacyPageRenderer';
-import { getLegacyPageDocument, listLegacyPageSlugs } from '@/lib/legacyDocuments';
+import { notFound, redirect } from 'next/navigation';
+import { legacySlugMap } from '@/lib/guides';
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return listLegacyPageSlugs()
-    .filter((slug) => slug !== 'fluxo.html')
+  return Object.keys(legacySlugMap)
+    .filter((slug) => slug !== 'index.html' && slug !== 'fluxo.html')
     .map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }) {
+export default async function LegacyContentRedirect({ params }) {
   const { slug } = await params;
-  const document = getLegacyPageDocument(slug);
-
-  if (!document) {
-    return {};
-  }
-
-  return {
-    title: document.title,
-  };
-}
-
-export default async function LegacyContentPage({ params }) {
-  const { slug } = await params;
-
-  if (slug === 'fluxo.html') {
-    notFound();
-  }
-
-  const document = getLegacyPageDocument(slug);
-
-  if (!document) {
-    notFound();
-  }
-
-  return <LegacyPageRenderer document={document} pageKey={`content-${slug}`} />;
+  const destination = legacySlugMap[slug];
+  if (!destination) notFound();
+  redirect(destination);
 }

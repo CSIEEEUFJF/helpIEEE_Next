@@ -1,41 +1,75 @@
-# Current state - HELPIEEE Next
+# Current state — HELPIEEE Next
 
-Last update: `2026-04-09`
+Last updated: `2026-09-03`
 
-## Quick summary
+## Summary
 
-The `helpieee-next` project is already published as a separate repository and works as a faithful migration of the original demo into Next.js.
+HELPIEEE has been rebuilt as a React/Next.js guide for first-year **Exact Sciences and Engineering students at UFJF**. The old interface and legacy document renderer were removed; content and curricula are now structured data rendered by native components.
 
-## What is ready
+## Delivered
 
-- home at `/` and `/index.html`
-- legacy pages at `/pages/*.html`
-- flow at `/pages/fluxo.html`
-- `/fluxo.html` alias
-- legacy HTML renderer inside Next
-- preserved light/dark theme
-- Electrical Engineering curricula
-- Computational Engineering curriculum
-- Computer Science full-time and evening curricula
-- fixed synchronized horizontal scrollbar in the flow
+- a visual identity aligned with the IEEE UFJF website, using institutional blue `#00629b`, Open Sans, light surfaces, and a dark theme;
+- a shared, responsive, accessible shell with header, footer, and mobile menu;
+- a home page with local search, explicit audience, and track entry points;
+- the `/guia` index and six static `/guia/[slug]` pages;
+- the `/fluxo` curriculum explorer with ten curricula, search, prerequisites, unlocks, and local progress;
+- preserved old `.html` aliases through redirects, with no legacy HTML dependency;
+- an Open Graph/Twitter image at [`public/og.png`](./public/og.png);
+- global metadata for the “Exact Sciences and Engineering guide at UFJF” positioning and a `metadataBase` configurable through `NEXT_PUBLIC_SITE_URL`;
+- Next.js `16.3.4` with React/React DOM `19.2.8`;
+- a Vinext/Vite Sites deployment layer with Cloudflare Worker-compatible output.
 
-## Core files for resuming work
+## Canonical routes
 
-- [`README_EN.md`](./README_EN.md)
-- [`components/LegacyPageRenderer.jsx`](./components/LegacyPageRenderer.jsx)
-- [`lib/legacyDocuments.js`](./lib/legacyDocuments.js)
-- [`legacy-source/pages/fluxo.html`](./legacy-source/pages/fluxo.html)
-- [`public/assets/js/pages/fluxo-data.js`](./public/assets/js/pages/fluxo-data.js)
-- [`public/assets/js/pages/fluxo.js`](./public/assets/js/pages/fluxo.js)
-- [`public/assets/css/pages/fluxo.css`](./public/assets/css/pages/fluxo.css)
+- `/`
+- `/guia`
+- `/guia/chegada`
+- `/guia/faculdade`
+- `/guia/estudos`
+- `/guia/comunidade`
+- `/guia/oportunidades`
+- `/guia/projeto`
+- `/fluxo`
+
+`/index.html`, `/fluxo.html`, `/pages/fluxo.html`, and the old `/pages/*.html` addresses redirect to current routes. `/oportunidades` and `/sobre` are convenience shortcuts.
+
+## Sources of truth
+
+- [`lib/guides.js`](./lib/guides.js): six guides, official links, `reviewedAt`, `sourceLabel`, editorial notes, and alias mapping;
+- [`lib/curricula.js`](./lib/curricula.js): ten curricula with periods, courses, workloads/credits, and prerequisites;
+- [`app/globals.css`](./app/globals.css): tokens and visual system;
+- [`components/GuideArticle.jsx`](./components/GuideArticle.jsx): editorial renderer;
+- [`components/CurriculumExplorer.jsx`](./components/CurriculumExplorer.jsx): explorer and progress persistence;
+- [`app/layout.js`](./app/layout.js): shell, font, social metadata, and configurable canonical origin;
+- [`vite.config.mjs`](./vite.config.mjs) and [`worker/index.js`](./worker/index.js): Sites build and runtime.
+
+## Editorial governance
+
+- Institutional or volatile information must state its source and review date.
+- Change `reviewedAt` only after reviewing both text and link.
+- Closed academic dates, assessments, and staff assignments from past terms must not remain on pages.
+- Course-, unit-, or campus-specific content must declare its scope.
+- Curricula must be checked against official documentation before editing.
+
+See [`README_EN.md`](./README_EN.md) for the full process.
 
 ## Latest validation
 
+Completed successfully on `2026-09-03`:
+
+- `npm run validate:content` — 6 guides, 21 sections, 83 items, 67 links, 10 curricula, and 544 courses
 - `npm run lint`
 - `npm run build`
+- all 29 pages processed by the production build
 
-## Attention points
+`npm run build` invokes content validation through `prebuild`; `npm run check` runs content, lint, and build in sequence.
 
-- the codebase is still mostly legacy, only wrapped by Next
-- workload-based prerequisites are not yet structurally modeled in the flow
-- changes in `legacy-source` should continue to respect the `mtime`-aware loader
+For Sites, `npm run build:sites` generates the production output and `npm run start:sites` runs it locally for verification. Set the canonical domain through `NEXT_PUBLIC_SITE_URL` before building. Internal hosting identifiers do not belong in documentation.
+
+## Ongoing care
+
+- run visual checks on desktop and mobile after layout changes;
+- test theme, menu, search, links, redirects, and flow `localStorage`;
+- keep [`public/og.png`](./public/og.png) aligned with the current visual positioning;
+- run `npm run build:sites` before a Sites release;
+- review links and editorial metadata each term without reintroducing expired dates.

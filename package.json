@@ -4,17 +4,31 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run validate:content",
     "build": "next build",
+    "build:sites": "npm run validate:content && WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "next start",
-    "lint": "eslint"
+    "start:sites": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "lint": "eslint",
+    "validate:content": "node scripts/validate-content.mjs",
+    "validate:links": "node scripts/check-links.mjs",
+    "check": "npm run validate:content && npm run lint && npm run build"
   },
   "dependencies": {
-    "next": "16.2.3",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "1.54.4",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitejs/plugin-rsc": "0.5.34",
     "eslint": "^9",
-    "eslint-config-next": "16.2.3"
-  }
+    "eslint-config-next": "16.3.4",
+    "react-server-dom-webpack": "19.2.8",
+    "vinext": "1.0.0-beta.9",
+    "vite": "8.2.2",
+    "wrangler": "4.129.0"
+  },
+  "type": "module"
 }

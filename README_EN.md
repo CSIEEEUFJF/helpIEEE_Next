@@ -1,328 +1,205 @@
 # HELPIEEE Next
 
-Versao em portugues disponivel em [`README.md`](README.md)
+Portuguese documentation: [`README.md`](./README.md)
 
-Main documentation for the `helpieee-next` project.
+Last reviewed: `2026-09-03`
 
-Last documentation revision: `2026-04-09`
+## Overview
 
-## 1. Overview
+HELPIEEE is an onboarding guide for first-year **Exact Sciences and Engineering students at UFJF**. The application brings together practical guidance, study resources, academic life, community, opportunities, and curriculum flows in a React/Next.js interface.
 
-This project migrates the original HELPIEEE demo to **React with Next.js**, preserving:
+The rebuild replaced the old injected HTML, CSS, and JavaScript delivery with:
 
-- the original page structure
-- legacy `.html` paths
-- legacy HTML
-- legacy CSS
-- legacy scripts
-- original assets
+- native React pages and components;
+- structured editorial content;
+- curricula centralized as data;
+- stable routes with redirects for old addresses;
+- a visual layer consistent with the [IEEE UFJF Student Branch](https://www.ieeeufjf.com.br/).
 
-The goal of this stage was not to redesign the product. The priority was to move the delivery to a modern React/Next foundation without breaking the navigation and behavior already known from the demo.
+## Audience and principles
 
-## 2. Current state
+General content serves students arriving at the Institute of Exact Sciences and the School of Engineering. Guidance that is specific to a course, unit, campus, or service must state its scope in the content itself.
 
-Working today:
+Editorial principles:
 
-- home at `/` and `/index.html`
-- legacy pages at `/pages/*.html`
-- curriculum flow at `/pages/fluxo.html`
-- `/fluxo.html` alias redirecting to `/pages/fluxo.html`
-- faithful rendering of the copied demo HTML
-- legacy CSS and script loading in original order
-- light/dark theme preserved by legacy scripts
-- curriculum flow with completed-course tracking via `localStorage`
-- curriculum flow with prerequisites, unlocks and arrows
-- curriculum flow with Electrical Engineering, Computational Engineering and Computer Science curricula
+- welcome readers without assuming prior knowledge of the university;
+- use direct, inclusive language across different programs;
+- prioritize official UFJF and IEEE UFJF pages;
+- identify the source and review date of changeable information;
+- never treat one curriculum as universal;
+- do not publish expired calendars, staff assignments, or assessment dates.
 
-Important notes about the current state:
+## Visual system
 
-- the app uses the Next **App Router**, but still serves legacy HTML
-- HTML is rendered from copies inside `legacy-source/`
-- changes in `legacy-source` are reloaded by file `mtime`, preventing stale in-memory cache during development
-- `html` and `body` use `suppressHydrationWarning` because legacy scripts mutate attributes before hydration
-- the curriculum flow still relies on legacy JavaScript, with data centralized in `public/assets/js/pages/fluxo-data.js`
-- the fixed horizontal bar in the flow is a synchronized mirror of the main scroll area to keep it always reachable on desktop
+The design follows the institutional language of the IEEE UFJF website:
 
-## 3. Stack and technical base
+- IEEE blue `#00629b` as the primary color;
+- light surfaces, editorial hierarchy, and strong contrast;
+- Open Sans loaded through `next/font`;
+- shared institutional header and footer;
+- responsive components and accessible mobile navigation;
+- light/dark theme with a locally stored preference;
+- visible focus states and semantic navigation structure.
 
-### 3.1 Platform
+Global tokens and styles live in [`app/globals.css`](./app/globals.css). The shared shell is defined in [`app/layout.js`](./app/layout.js).
 
-- framework: `Next.js 16.2.3`
-- view layer: `React 19.2.4`
-- lint: `ESLint 9`
-- routing: `App Router`
+## Routes
 
-### 3.2 Migration strategy
+| Route | Purpose |
+| --- | --- |
+| `/` | Home, editorial search, course overview, and entry points |
+| `/guia` | Index of the six content tracks |
+| `/guia/[slug]` | Structured page for one track |
+| `/fluxo` | Interactive curriculum explorer |
 
-The project does not yet rewrite the demo as equivalent React UI components. Instead, it:
+Available `/guia/[slug]` values:
 
-- copies the original HTML into `legacy-source/`
-- extracts `body`, `link rel="stylesheet"` and `script`
-- injects that content into Next routes
+- `chegada` — first steps;
+- `faculdade` — academic life;
+- `estudos` — resources and studying;
+- `comunidade` — community and support;
+- `oportunidades` — IEEE and opportunities;
+- `projeto` — about HELPIEEE.
 
-This approach reduces visual and functional regression risk during the initial migration.
+Supporting routes:
 
-## 4. Repository structure
+- `/oportunidades` redirects to the opportunities track;
+- `/sobre` redirects to the project track.
 
-Main directories:
+Backward-compatible routes:
 
-- [`app`](./app): Next routes and layouts
-- [`components`](./components): legacy page renderer
-- [`lib`](./lib): legacy HTML loading and shared metadata
-- [`legacy-source`](./legacy-source): copied HTML from the original demo
-- [`public/assets`](./public/assets): copied assets from the original demo
+- `/index.html` redirects to `/`;
+- `/fluxo.html` and `/pages/fluxo.html` redirect to `/fluxo`;
+- `/pages/*.html` uses the `legacySlugMap` in [`lib/guides.js`](./lib/guides.js) to redirect each old page to its equivalent track.
 
-Support files:
+Aliases preserve already-shared links but do not render or depend on legacy documents.
 
-- [`CURRENT_STATE_EN.md`](./CURRENT_STATE_EN.md): quick resume snapshot
-- [`package.json`](./package.json): scripts and dependencies
-- [`next.config.mjs`](./next.config.mjs): minimal Next configuration
+## Architecture
 
-## 5. Software architecture
+### Platform
 
-## 5.1 Main modules
+- Next.js `16.3.4` with the App Router;
+- React and React DOM `19.2.8`;
+- ESLint `9`;
+- static rendering for content tracks and on-demand rendering for the flow route with a course parameter.
 
-- [`components/LegacyPageRenderer.jsx`](./components/LegacyPageRenderer.jsx)
-  - injects legacy page styles
-  - injects `head` scripts
-  - injects `body` HTML
-  - injects `body` scripts
-  - preserves the original execution order
+### Editorial content
 
-- [`lib/legacyDocuments.js`](./lib/legacyDocuments.js)
-  - reads HTML files from `legacy-source/`
-  - extracts title, `body` attributes, styles and scripts
-  - strips scripts from the main HTML and re-inserts them explicitly
-  - uses `mtime`-aware in-memory caching
+[`lib/guides.js`](./lib/guides.js) is the source of truth for the guides. It exports:
 
-- [`app/(home)`](./app/%28home%29)
-  - serves the original home page
-  - applies `body.page-home`
+- `guides`: all six complete tracks;
+- `guideCategories`: summarized navigation data;
+- `guidesBySlug` and `getGuideBySlug`: slug-based access;
+- `officialLinks`: reused institutional links;
+- `legacySlugMap`: redirect targets for old aliases;
+- `editorialNotes`: scope decisions, removed temporal content, and publication checks.
 
-- [`app/(content)`](./app/%28content%29)
-  - serves legacy content pages
-  - applies `body.page-content`
+Each guide includes a title, summary, audience, scope, keywords, `reviewedAt`, `sourceLabel`, legacy slugs, and sections. Sections contain paragraphs and items with text, lists, links, and item-level source/review metadata when needed.
 
-- [`app/(flow)`](./app/%28flow%29)
-  - serves the curriculum flow
-  - applies `body.page-flow`
-  - preserves `/pages/fluxo.html`
-  - redirects `/fluxo.html`
+### Curriculum flows
 
-- [`public/assets/js/pages/fluxo-data.js`](./public/assets/js/pages/fluxo-data.js)
-  - centralizes curriculum data
-  - defines courses, periods, workloads and prerequisites
+[`lib/curricula.js`](./lib/curricula.js) centralizes periods, courses, workload/credits, and prerequisites. Ten curricula are registered:
 
-- [`public/assets/js/pages/fluxo.js`](./public/assets/js/pages/fluxo.js)
-  - builds the flow at runtime
-  - draws arrows
-  - handles selection and progress
-  - synchronizes the fixed horizontal scrollbar
+- Electrical Engineering — Electronic Systems;
+- Electrical Engineering — Power Systems;
+- Electrical Engineering — Robotics and Industrial Automation;
+- Electrical Engineering — Energy;
+- Electrical Engineering — Telecommunications;
+- Computational Engineering;
+- Civil Engineering;
+- Computer Science — full-time and evening;
+- Information Systems.
 
-## 5.2 Layouts and hydration
+The explorer supports curriculum selection, search by name or code, prerequisite and unlock inspection, completion tracking, and progress summaries. Progress remains in the browser through `localStorage`.
 
-Each route group uses its own layout to reproduce the original demo `body` classes:
+The flow is a planning aid: enrollment and equivalence decisions must always be confirmed in SIGA and with the relevant program office.
 
-- [`app/(home)/layout.js`](./app/%28home%29/layout.js)
-- [`app/(content)/layout.js`](./app/%28content%29/layout.js)
-- [`app/(flow)/layout.js`](./app/%28flow%29/layout.js)
+### Main components
 
-All of them use:
+- [`SiteHeader`](./components/SiteHeader.jsx), [`SiteFooter`](./components/SiteFooter.jsx), and [`siteNavigation`](./components/siteNavigation.js): institutional shell and navigation;
+- [`MobileNavigation`](./components/MobileNavigation.jsx): mobile menu with Escape and outside-click handling;
+- [`ThemeToggle`](./components/ThemeToggle.jsx): browser-persisted theme preference;
+- [`GuideCard`](./components/GuideCard.jsx): reusable entry point for tracks;
+- [`GuideArticle`](./components/GuideArticle.jsx): semantic rendering of sections, sources, and review dates;
+- [`HomeSearch`](./components/HomeSearch.jsx): local search across guides and sections;
+- [`CurriculumExplorer`](./components/CurriculumExplorer.jsx) and its [CSS Module](./components/CurriculumExplorer.module.css): curriculum interaction, search, relationships, and progress.
 
-- `lang="pt-BR"`
-- `suppressHydrationWarning` on `html`
-- `suppressHydrationWarning` on `body`
+### Sites deployment
 
-This is necessary because theme and flow scripts mutate attributes such as:
+The project keeps the conventional Next.js workflow and a dedicated Sites output. [`vite.config.mjs`](./vite.config.mjs) combines Vinext, Vite, and the Cloudflare adapter to produce a Worker-compatible application; [`worker/index.js`](./worker/index.js) serves the App Router and image optimization. Hosting configuration lives in `.openai/hosting.json`, and its internal identifiers must not be copied into documentation, issues, or logs.
 
-- `data-theme`
-- `style.colorScheme`
-- `data-curriculum`
+- `npm run build:sites` validates content and generates the Sites production output;
+- `npm run start:sites` starts that output locally for verification;
+- `npm run build` and `npm run start` remain available for the conventional Next.js runtime.
 
-before React hydrates the page.
+Set `NEXT_PUBLIC_SITE_URL` to the environment's canonical origin before building. [`app/layout.js`](./app/layout.js) uses it as `metadataBase`; when unset, it falls back to `https://help.ieeeufjf.com.br`.
 
-## 5.3 Main routing model
+## Social image
 
-Main routes:
+[`public/og.png`](./public/og.png) is the project's Open Graph/Twitter image (`1735 × 906`). It is declared in [`app/layout.js`](./app/layout.js), which resolves its absolute URL from `NEXT_PUBLIC_SITE_URL`. Whenever the name, positioning, domain, or visual identity changes, review the image and its alternative text together.
 
-- `/`
-- `/index.html`
-- `/pages/primeiros-passos.html`
-- `/pages/faculdade.html`
-- `/pages/materiais.html`
-- `/pages/materiais-algoritmos.html`
-- `/pages/materiais-calculo.html`
-- `/pages/materiais-geometria-analitica.html`
-- `/pages/materiais-introducao-engenharia-eletrica.html`
-- `/pages/materiais-laboratorio-ciencias-fisicas.html`
-- `/pages/materiais-laboratorio-quimica.html`
-- `/pages/materiais-quimica-fundamental.html`
-- `/pages/comunidade.html`
-- `/pages/ieee.html`
-- `/pages/fluxo.html`
-- `/fluxo.html`
+## Development
 
-Note:
+```bash
+npm install
+npm run dev
+```
 
-- the dynamic content route uses `generateStaticParams()` to pre-render legacy slugs, except for `fluxo.html`
+Open `http://localhost:3000`.
 
-## 6. Curriculum flow
-
-## 6.1 What the flow currently provides
-
-The current curriculum flow supports:
-
-- curriculum selection
-- prerequisite highlighting
-- unlock highlighting
-- arrows between courses
-- navigate mode and completed-course marking mode
-- local progress persistence per curriculum
-- light/dark theme
-- fixed and synchronized horizontal scrollbar
-
-## 6.2 Curricula currently registered
-
-Available curricula today:
-
-- Electrical Engineering - Electronic Systems
-- Electrical Engineering - Power Systems
-- Electrical Engineering - Robotics and Industrial Automation
-- Electrical Engineering - Energy
-- Computational Engineering
-- Computer Science (Full-time)
-- Computer Science (Evening)
-
-Notes:
-
-- the Computer Science curricula were added from official UFJF documentation
-- the flow currently represents prerequisites by course code
-- workload-based requirements, such as `TCC I` in Computer Science, appear only as textual notes in the card title
-
-## 6.3 Main flow files
-
-- [`legacy-source/pages/fluxo.html`](./legacy-source/pages/fluxo.html)
-- [`public/assets/css/pages/fluxo.css`](./public/assets/css/pages/fluxo.css)
-- [`public/assets/js/pages/fluxo-data.js`](./public/assets/js/pages/fluxo-data.js)
-- [`public/assets/js/pages/fluxo.js`](./public/assets/js/pages/fluxo.js)
-
-## 7. Assets and content strategy
-
-Demo assets were copied into `public/assets/` to preserve:
-
-- original relative paths
-- existing images and icons
-- page-level CSS
-- original scripts
-
-HTML files were copied into `legacy-source/` to:
-
-- avoid changing the original demo
-- let the Next project evolve in isolation
-- keep a local source of truth for the legacy layer
-
-## 8. Available scripts
-
-Main commands:
+Available scripts:
 
 ```bash
 npm run dev
+npm run validate:content
+npm run validate:links
 npm run lint
 npm run build
+npm run build:sites
 npm run start
+npm run start:sites
+npm run check
 ```
 
-Typical usage:
+`npm run validate:content` checks guide and curriculum structure, unique slugs and IDs, link format, review dates, and references to closed terms. `npm run validate:links` requests the published external URLs. `npm run build` runs structural validation automatically through `prebuild`; `npm run check` chains content validation, lint, and build.
 
-1. `npm install`
-2. `npm run dev`
-3. open `http://localhost:3000`
+## Validation
 
-## 9. Validation
+Before delivering a change:
 
-Validations already executed on this codebase:
+1. run `npm run validate:content`;
+2. run `npm run validate:links` before publishing content; timeouts and bot protection require manual confirmation;
+3. run `npm run lint`;
+4. run `npm run build`;
+5. for a Sites release, set `NEXT_PUBLIC_SITE_URL` and run `npm run build:sites`;
+6. inspect `/`, `/guia`, one `/guia/[slug]` page, and `/fluxo` on desktop and mobile;
+7. test theme, menu, search, external links, and flow persistence;
+8. confirm that old aliases redirect correctly.
 
-- `npm run lint`
-- `npm run build`
+In the `2026-09-03` review, `npm run validate:content`, `npm run lint`, and `npm run build` completed without errors. The validator checked 6 guides, 21 sections, 83 items, 67 links, 10 curricula, and 544 courses; all 29 pages processed by the build were generated successfully.
 
-These checks help confirm:
+## Updating content
 
-- basic integrity of the Next routes
-- absence of lint errors in the new code
-- successful static generation of mapped pages
+1. Find the official source responsible for the information.
+2. Update the matching item in [`lib/guides.js`](./lib/guides.js).
+3. Set `sourceLabel` and change `reviewedAt` only after reviewing both content and link.
+4. Remove closed dates; do not accumulate calendars, assessments, or staff assignments from past terms.
+5. Record temporal exclusions or scope decisions in `editorialNotes`.
+6. When changing a curriculum, confirm program, version, periods, codes, workloads, and prerequisites before editing [`lib/curricula.js`](./lib/curricula.js).
+7. Run validation and visually inspect the affected pages.
 
-## 10. Most important files for maintenance
+Do not copy information from informal groups as if it were official. Older materials may remain only when still useful, properly sourced, and clearly contextualized.
 
-- [`components/LegacyPageRenderer.jsx`](./components/LegacyPageRenderer.jsx)
-- [`lib/legacyDocuments.js`](./lib/legacyDocuments.js)
-- [`lib/metadata.js`](./lib/metadata.js)
-- [`app/(home)/page.js`](./app/%28home%29/page.js)
-- [`app/(content)/pages/[slug]/page.js`](./app/%28content%29/pages/%5Bslug%5D/page.js)
-- [`app/(flow)/pages/fluxo.html/page.js`](./app/%28flow%29/pages/fluxo.html/page.js)
-- [`app/(flow)/fluxo.html/page.js`](./app/%28flow%29/fluxo.html/page.js)
-- [`legacy-source/pages/fluxo.html`](./legacy-source/pages/fluxo.html)
-- [`public/assets/js/pages/fluxo-data.js`](./public/assets/js/pages/fluxo-data.js)
-- [`public/assets/js/pages/fluxo.js`](./public/assets/js/pages/fluxo.js)
-- [`public/assets/css/pages/fluxo.css`](./public/assets/css/pages/fluxo.css)
+## Key files for resuming work
 
-## 11. Limitations and care points
-
-### 11.1 Migration scope
-
-The project has not yet converted legacy pages into semantically rewritten React components.
-
-Today:
-
-- the visual layer is still mostly legacy HTML
-- interaction scripts still rely on the original implementation
-
-### 11.2 Hydration and pre-React mutations
-
-Because legacy scripts mutate `html` and `body` early:
-
-- hydration warnings may return if new mutations are introduced carelessly
-- layouts should continue to respect `suppressHydrationWarning`
-
-### 11.3 HTML cache and loading
-
-The legacy loader uses an `mtime`-aware in-memory cache.
-
-Because of that:
-
-- changes in `legacy-source` are reflected without stale cache issues
-- future changes should preserve this behavior
-
-### 11.4 Curriculum flow model
-
-The current flow does not model:
-
-- workload-based prerequisites
-- formal co-requisites
-- more complex conditional curriculum rules
-
-If that becomes necessary, the format of `fluxo-data.js` will need to be expanded.
-
-## 12. Quick validation checklist
-
-After important changes, it is worth validating:
-
-1. Home at `/` and `/index.html`.
-2. Navigation across legacy pages in `/pages/*.html`.
-3. `/fluxo.html` alias.
-4. Theme switching.
-5. Curriculum switching in the flow.
-6. Prerequisite and unlock highlights.
-7. Completed-course marking.
-8. Local progress persistence.
-9. Fixed horizontal scrollbar in the flow.
-10. `npm run lint`.
-11. `npm run build`.
-
-## 13. Auxiliary documents
-
-For additional context:
-
-- [`CURRENT_STATE_EN.md`](./CURRENT_STATE_EN.md): quick resume snapshot
-- [`README.md`](./README.md): Portuguese version of this documentation
-
-This `README_EN.md` should be treated as the main complete English documentation for the project.
+- [`CURRENT_STATE_EN.md`](./CURRENT_STATE_EN.md)
+- [`app/layout.js`](./app/layout.js)
+- [home](<./app/(home)/page.js>)
+- [guide index](./app/guia/page.js)
+- [dynamic guide route](<./app/guia/[slug]/page.js>)
+- [curriculum flow](./app/fluxo/page.js)
+- [`lib/guides.js`](./lib/guides.js)
+- [`lib/curricula.js`](./lib/curricula.js)
+- [`app/globals.css`](./app/globals.css)
+- [`vite.config.mjs`](./vite.config.mjs)
+- [`worker/index.js`](./worker/index.js)
