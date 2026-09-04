@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { GuideCard } from '@/components/GuideCard';
 import { HomeSearch } from '@/components/HomeSearch';
 import { guides } from '@/lib/guides';
@@ -22,26 +23,42 @@ const engineeringCourses = [
   'Engenharia Mecânica',
 ];
 
+function normalizeSearchText(value) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
 function buildSearchEntries() {
   return guides.flatMap((guide) => {
     const guideEntry = {
       eyebrow: guide.eyebrow,
       title: guide.title,
       summary: guide.summary,
-      keywords: `${guide.audience ?? ''} ${guide.scope ?? ''}`,
+      searchText: normalizeSearchText(
+        `${guide.title} ${guide.summary} ${guide.audience ?? ''} ${guide.scope ?? ''}`,
+      ),
       href: `/guia/${guide.slug}`,
     };
 
-    const sectionEntries = (guide.sections ?? []).map((section) => ({
-      eyebrow: guide.title,
-      title: section.title,
-      summary: section.summary ?? guide.summary,
-      keywords: (section.items ?? [])
+    const sectionEntries = (guide.sections ?? []).map((section) => {
+      const keywords = (section.items ?? [])
         .flatMap((item) => [item.title, item.text, ...(item.list ?? [])])
         .filter(Boolean)
-        .join(' '),
-      href: `/guia/${guide.slug}#${section.id}`,
-    }));
+        .join(' ');
+      const summary = section.summary ?? guide.summary;
+
+      return {
+        eyebrow: guide.title,
+        title: section.title,
+        summary,
+        searchText: normalizeSearchText(
+          `${section.title} ${summary} ${keywords}`,
+        ),
+        href: `/guia/${guide.slug}#${section.id}`,
+      };
+    });
 
     return [guideEntry, ...sectionEntries];
   });
@@ -52,13 +69,14 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="hero-section">
+      <section className="hero-section" data-header-splash>
         <div className="container hero-grid">
           <div className="hero-copy">
             <div className="hero-kicker">
-              <span>Uma iniciativa IEEE UFJF</span>
-              <span aria-hidden="true">•</span>
-              <span>Feito por estudantes</span>
+              <span>
+                Um projeto desenvolvido pela IEEE Computer Society e IEEE
+                Education Society do Ramo Estudantil IEEE UFJF
+              </span>
             </div>
             <h1>
               Comece a UFJF com <span>direção.</span>
@@ -121,24 +139,20 @@ export default function HomePage() {
           <div className="courses-copy">
             <span className="eyebrow">Para quem é o HELPIEEE</span>
             <h2>Vários cursos. A mesma sensação de estar começando.</h2>
-            <p>O conteúdo geral atende quem chega ao ICE e à Faculdade de Engenharia. Quando uma orientação muda por curso, nós sinalizamos o escopo e apontamos a fonte correta.</p>
-            <div className="trust-note">
-              <span aria-hidden="true">✓</span>
-              <p><strong>Transparência editorial</strong>Informações acadêmicas importantes sempre levam à página oficial responsável.</p>
-            </div>
+            <p>O conteúdo atende quem chega ao ICE e à Faculdade de Engenharia, reunindo orientações para diferentes cursos e etapas da graduação.</p>
           </div>
           <div className="course-panels">
             <article className="course-panel">
               <span className="course-panel__mark" aria-hidden="true">∑</span>
               <h3>Ciências Exatas</h3>
               <ul>{exactCourses.map((course) => <li key={course}>{course}</li>)}</ul>
-              <a href="https://www2.ufjf.br/ice/ensino/graduacao/cursos-de-graduacao/" target="_blank" rel="noreferrer">Ver cursos no ICE <span aria-hidden="true">↗</span></a>
+              <a href="https://www2.ufjf.br/ice/ensino/graduacao/cursos-de-graduacao/" target="_blank" rel="noreferrer">Ver cursos do ICE <span aria-hidden="true">↗</span></a>
             </article>
             <article className="course-panel course-panel--blue">
               <span className="course-panel__mark" aria-hidden="true">△</span>
               <h3>Engenharias</h3>
               <ul>{engineeringCourses.map((course) => <li key={course}>{course}</li>)}</ul>
-              <a href="https://www2.ufjf.br/prograd/cursos-de-graduacao-2/" target="_blank" rel="noreferrer">Ver cursos na Prograd <span aria-hidden="true">↗</span></a>
+              <a href="https://www2.ufjf.br/engenharia/ensino/cursos/" target="_blank" rel="noreferrer">Ver cursos da Engenharia <span aria-hidden="true">↗</span></a>
             </article>
           </div>
         </div>
@@ -182,7 +196,14 @@ export default function HomePage() {
 
       <section className="section">
         <div className="container origin-grid">
-          <div className="origin-mark" aria-hidden="true"><span>IEEE</span><small>UFJF</small></div>
+          <div className="origin-mark">
+            <Image
+              src="/assets/images/branding/ieee-ufjf.svg"
+              alt="Logo do Ramo Estudantil IEEE UFJF"
+              width={1024}
+              height={1024}
+            />
+          </div>
           <div>
             <span className="eyebrow">Quem faz</span>
             <h2>Conhecimento compartilhado também é acolhimento.</h2>

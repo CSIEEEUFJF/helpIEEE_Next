@@ -1,17 +1,30 @@
 'use client';
 
 import { useEffect, useSyncExternalStore } from 'react';
+import {
+  DARK_THEME,
+  LIGHT_THEME,
+  THEME_CHANGE_EVENT,
+  THEME_STORAGE_KEY,
+} from '@/lib/theme';
 
-const STORAGE_KEY = 'helpieee-theme';
-const DARK_THEME = 'dark';
-const LIGHT_THEME = 'light';
-const THEME_CHANGE_EVENT = 'helpieee-theme-change';
+let inMemoryTheme = null;
 
 function getPreferredTheme() {
-  const savedTheme = window.localStorage.getItem(STORAGE_KEY);
+  let savedTheme;
+
+  try {
+    savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch {
+    savedTheme = null;
+  }
 
   if (savedTheme === DARK_THEME || savedTheme === LIGHT_THEME) {
     return savedTheme;
+  }
+
+  if (inMemoryTheme === DARK_THEME || inMemoryTheme === LIGHT_THEME) {
+    return inMemoryTheme;
   }
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -20,19 +33,30 @@ function getPreferredTheme() {
 }
 
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.documentElement.style.colorScheme = theme;
+  const root = document.documentElement;
+
+  if (root.dataset.theme !== theme) root.dataset.theme = theme;
+  if (root.style.colorScheme !== theme) root.style.colorScheme = theme;
 }
 
 function subscribeToTheme(callback) {
   const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
   function handleSystemPreference() {
-    if (!window.localStorage.getItem(STORAGE_KEY)) callback();
+    try {
+      if (!window.localStorage.getItem(THEME_STORAGE_KEY) && !inMemoryTheme) {
+        callback();
+      }
+    } catch {
+      if (!inMemoryTheme) callback();
+    }
   }
 
   function handleStorage(event) {
-    if (event.key === STORAGE_KEY) callback();
+    if (event.key === THEME_STORAGE_KEY) {
+      inMemoryTheme = null;
+      callback();
+    }
   }
 
   colorScheme.addEventListener('change', handleSystemPreference);
@@ -63,7 +87,14 @@ export function ThemeToggle({ className = '' }) {
 
   function toggleTheme() {
     const nextTheme = theme === DARK_THEME ? LIGHT_THEME : DARK_THEME;
-    window.localStorage.setItem(STORAGE_KEY, nextTheme);
+
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      inMemoryTheme = null;
+    } catch {
+      inMemoryTheme = nextTheme;
+    }
+
     applyTheme(nextTheme);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }

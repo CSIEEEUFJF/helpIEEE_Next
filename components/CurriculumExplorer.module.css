@@ -7,6 +7,24 @@
   --flow-border: var(--line, #d8e2e8);
   --flow-surface: var(--surface, #ffffff);
   --flow-page: var(--surface-soft, #f5f8fa);
+  --flow-prerequisite: #c66b00;
+  --flow-prerequisite-background: color-mix(
+    in srgb,
+    var(--flow-prerequisite) 9%,
+    var(--flow-surface)
+  );
+  --flow-unlock: #268262;
+  --flow-unlock-background: color-mix(
+    in srgb,
+    var(--flow-unlock) 9%,
+    var(--flow-surface)
+  );
+  --flow-corequisite: #7052a3;
+  --flow-corequisite-background: color-mix(
+    in srgb,
+    var(--flow-corequisite) 9%,
+    var(--flow-surface)
+  );
   width: min(100%, 96rem);
   margin-inline: auto;
   color: var(--flow-ink);
@@ -159,6 +177,91 @@
   line-height: 1.5;
 }
 
+.flowControls {
+  display: grid;
+  grid-template-columns: auto minmax(14rem, 1fr) auto;
+  gap: 1rem 1.5rem;
+  align-items: end;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--flow-border);
+  border-radius: 0.5rem;
+  background: var(--flow-page);
+}
+
+.flowControlsLabel {
+  margin: 0 0 0.45rem;
+  color: var(--flow-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.flowModeGroup {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid var(--flow-border);
+  border-radius: 0.42rem;
+  background: var(--flow-surface);
+}
+
+.flowModeGroup button,
+.flowResetButton {
+  min-height: 2.45rem;
+  border-radius: 0.3rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flowModeGroup button {
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--flow-muted);
+}
+
+.flowModeGroup button:hover,
+.flowModeGroup button:focus-visible {
+  color: var(--flow-blue-dark);
+}
+
+.flowModeGroup .flowModeActive {
+  background: var(--flow-blue);
+  color: #ffffff;
+}
+
+.flowModeGroup .flowModeActive:hover,
+.flowModeGroup .flowModeActive:focus-visible {
+  color: #ffffff;
+}
+
+.flowControlsHint {
+  margin: 0 0 0.58rem;
+  color: var(--flow-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.flowResetButton {
+  margin-bottom: 0.1rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--flow-border);
+  background: var(--flow-surface);
+  color: var(--flow-blue-dark);
+}
+
+.flowResetButton:hover:not(:disabled),
+.flowResetButton:focus-visible:not(:disabled) {
+  border-color: var(--flow-blue);
+  background: var(--flow-blue-soft);
+}
+
+.flowResetButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .flowToolbar {
   display: flex;
   gap: 1.25rem;
@@ -193,28 +296,159 @@
   line-height: 1.2;
 }
 
-.flowCompactRelations {
+.flowOfficialSource {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+  margin-top: 0.45rem;
+  color: var(--flow-blue);
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.flowOfficialSource:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.flowOfficialSource:focus-visible {
+  border-radius: 0.2rem;
+  outline: 3px solid rgb(0 98 155 / 20%);
+  outline-offset: 0.2rem;
+}
+
+.flowLegend {
+  display: flex;
+  flex: 0 1 34rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
+  justify-content: flex-end;
+}
+
+.flowLegend span {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  color: var(--flow-muted);
+  font-size: 0.7rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.flowLegend i {
+  width: 0.68rem;
+  height: 0.68rem;
+  border: 2px solid transparent;
+  border-radius: 0.16rem;
+  background: var(--flow-surface);
+}
+
+.flowLegend .flowLegendSelected {
+  border-color: var(--flow-blue);
+}
+
+.flowLegend .flowLegendPrerequisite {
+  border-color: var(--flow-prerequisite);
+  background: var(--flow-prerequisite-background);
+}
+
+.flowLegend .flowLegendUnlock {
+  border-color: var(--flow-unlock);
+  background: var(--flow-unlock-background);
+}
+
+.flowLegend .flowLegendCorequisite {
+  border-color: var(--flow-corequisite);
+  background: var(--flow-corequisite-background);
+}
+
+.flowLegend .flowLegendCompleted {
+  border-color: #71a38f;
+  background: #e6f3ed;
+}
+
+.flowHorizontalHint {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 1rem 0 0;
+  color: var(--flow-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.flowHorizontalHint span {
+  display: inline-grid;
   flex: 0 0 auto;
-  max-width: 20rem;
-  text-align: right;
+  width: 1.65rem;
+  height: 1.65rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--flow-blue-soft);
+  color: var(--flow-blue-dark);
+  font-size: 1rem;
+  font-weight: 800;
 }
 
 .flowPeriods {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  grid-auto-columns: clamp(15.5rem, 22vw, 17.5rem);
+  grid-auto-flow: column;
+  grid-template-rows: auto;
   gap: 1rem;
   align-items: start;
-  padding: 1.25rem 0 2rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 1rem 0.2rem 1.1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  cursor: grab;
+  scrollbar-color: var(--flow-blue) var(--flow-page);
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+}
+
+.flowPeriods[data-dragging="true"] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.flowPeriods[data-dragging="true"] * {
+  cursor: grabbing !important;
+}
+
+.flowPeriods:focus-visible {
+  outline: 3px solid rgb(0 98 155 / 22%);
+  outline-offset: 0.2rem;
+}
+
+.flowPeriods::-webkit-scrollbar {
+  height: 0.8rem;
+}
+
+.flowPeriods::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: var(--flow-page);
+}
+
+.flowPeriods::-webkit-scrollbar-thumb {
+  border: 0.18rem solid var(--flow-page);
+  border-radius: 999px;
+  background: var(--flow-blue);
 }
 
 .flowPeriod {
   min-width: 0;
+  align-self: start;
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 36rem;
   padding: 0.85rem;
   border: 1px solid var(--flow-border);
   border-radius: 0.55rem;
   background: var(--flow-page);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 34rem;
 }
 
 .flowPeriodHeader {
@@ -241,6 +475,17 @@
   gap: 0.65rem;
 }
 
+.flowPeriodEmpty {
+  margin: 0;
+  padding: 0.9rem 0.75rem;
+  border: 1px dashed var(--flow-border);
+  border-radius: 0.4rem;
+  color: var(--flow-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .flowCard {
   overflow: hidden;
   border: 1px solid var(--flow-border);
@@ -249,19 +494,7 @@
   box-shadow: 0 0.2rem 0.7rem rgb(25 59 79 / 4%);
   transition:
     border-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
-}
-
-.flowCard:hover {
-  border-color: #9dbbc9;
-  box-shadow: 0 0.45rem 1rem rgb(25 59 79 / 9%);
-  transform: translateY(-1px);
-}
-
-.flowCardSelected {
-  border-color: var(--flow-blue);
-  box-shadow: 0 0 0 2px rgb(0 98 155 / 16%);
+    background-color 160ms ease;
 }
 
 .flowCardCompleted {
@@ -270,6 +503,30 @@
 
 .flowCardAvailable:not(.flowCardCompleted) {
   border-left: 0.22rem solid var(--flow-blue);
+}
+
+.flowCard.flowCardPrerequisite {
+  border-color: var(--flow-prerequisite);
+  background: var(--flow-prerequisite-background);
+  box-shadow: 0 0 0 2px rgb(198 107 0 / 12%);
+}
+
+.flowCard.flowCardUnlock {
+  border-color: var(--flow-unlock);
+  background: var(--flow-unlock-background);
+  box-shadow: 0 0 0 2px rgb(38 130 98 / 12%);
+}
+
+.flowCard.flowCardCorequisite {
+  border-color: var(--flow-corequisite);
+  background: var(--flow-corequisite-background);
+  box-shadow: 0 0 0 2px rgb(112 82 163 / 12%);
+}
+
+.flowCard.flowCardSelected {
+  border-color: var(--flow-blue);
+  background: var(--flow-blue-soft);
+  box-shadow: 0 0 0 3px rgb(0 98 155 / 20%);
 }
 
 .flowCardButton {
@@ -332,9 +589,32 @@
   color: var(--flow-blue-dark);
 }
 
+.flowStatusCorequisite {
+  background: var(--flow-corequisite-background);
+  color: color-mix(in srgb, var(--flow-corequisite) 86%, var(--flow-ink));
+}
+
 .flowStatusBlocked {
   background: #eef1f3;
   color: #687681;
+}
+
+.flowRelationBadge {
+  width: fit-content;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.flowRelationBadgePrerequisite {
+  color: color-mix(in srgb, var(--flow-prerequisite) 82%, var(--flow-ink));
+}
+
+.flowRelationBadgeUnlock {
+  color: color-mix(in srgb, var(--flow-unlock) 82%, var(--flow-ink));
+}
+
+.flowRelationBadgeCorequisite {
+  color: color-mix(in srgb, var(--flow-corequisite) 82%, var(--flow-ink));
 }
 
 .flowCompletionControl,
@@ -391,7 +671,7 @@
 
 .flowRelationships {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(1rem, 3vw, 2.5rem);
   margin-top: 1.5rem;
   padding-top: 1.5rem;
@@ -478,6 +758,217 @@
   cursor: pointer;
 }
 
+/* Keep the dark experience aligned with ieeeufjf.com.br: neutral graphite
+   surfaces, high-contrast white controls and no semantic reliance on hue. */
+:global(:root[data-theme="dark"]) .flowExplorer {
+  --flow-blue: #ffffff;
+  --flow-blue-dark: #ffffff;
+  --flow-blue-soft: #2a2a2a;
+  --flow-ink: #e8eaed;
+  --flow-muted: #bdc1c6;
+  --flow-border: #3c4043;
+  --flow-surface: #1f1f1f;
+  --flow-page: #181818;
+  --flow-prerequisite: #f1f1f1;
+  --flow-prerequisite-background: #181818;
+  --flow-unlock: #b9b9b9;
+  --flow-unlock-background: #242424;
+  --flow-corequisite: #8c8c8c;
+  --flow-corequisite-background: #151515;
+  color-scheme: dark;
+}
+
+:global(:root[data-theme="dark"]) .flowCourseField select,
+:global(:root[data-theme="dark"]) .flowSearchField input,
+:global(:root[data-theme="dark"]) .flowSummary,
+:global(:root[data-theme="dark"]) .flowCard,
+:global(:root[data-theme="dark"]) .flowDetails {
+  box-shadow: 0 0.55rem 1.5rem rgb(0 0 0 / 34%);
+}
+
+:global(:root[data-theme="dark"]) .flowCourseField select:focus-visible,
+:global(:root[data-theme="dark"]) .flowSearchField input:focus-visible,
+:global(:root[data-theme="dark"]) .flowCardButton:focus-visible,
+:global(:root[data-theme="dark"]) .flowCompletionControl:has(input:focus-visible),
+:global(:root[data-theme="dark"]) .flowDetailsCompletion:has(input:focus-visible),
+:global(:root[data-theme="dark"]) .flowRelationButton:focus-visible,
+:global(:root[data-theme="dark"]) .flowEmpty button:focus-visible,
+:global(:root[data-theme="dark"]) .flowPeriods:focus-visible {
+  border-color: #ffffff;
+  outline-color: rgb(255 255 255 / 82%);
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 32%);
+}
+
+:global(:root[data-theme="dark"]) .flowOfficialSource:focus-visible {
+  outline-color: rgb(255 255 255 / 82%);
+}
+
+:global(:root[data-theme="dark"]) .flowProgress,
+:global(:root[data-theme="dark"]) .flowProgress::-webkit-progress-bar {
+  background: #3c4043;
+}
+
+:global(:root[data-theme="dark"]) .flowProgress::-webkit-progress-value,
+:global(:root[data-theme="dark"]) .flowProgress::-moz-progress-bar {
+  background: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .flowModeGroup .flowModeActive,
+:global(:root[data-theme="dark"]) .flowModeGroup .flowModeActive:hover,
+:global(:root[data-theme="dark"]) .flowModeGroup .flowModeActive:focus-visible,
+:global(:root[data-theme="dark"]) .flowEmpty button {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #121212;
+}
+
+:global(:root[data-theme="dark"]) .flowModeGroup button:hover,
+:global(:root[data-theme="dark"]) .flowModeGroup button:focus-visible,
+:global(:root[data-theme="dark"]) .flowResetButton,
+:global(:root[data-theme="dark"]) .flowOfficialSource,
+:global(:root[data-theme="dark"]) .flowPeriodHeader h3,
+:global(:root[data-theme="dark"]) .flowCode,
+:global(:root[data-theme="dark"]) .flowRelationCode {
+  color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .flowResetButton:hover:not(:disabled),
+:global(:root[data-theme="dark"]) .flowResetButton:focus-visible:not(:disabled),
+:global(:root[data-theme="dark"]) .flowRelationButton:hover {
+  border-color: #ffffff;
+  background: #2a2a2a;
+}
+
+:global(:root[data-theme="dark"]) .flowCard:hover {
+  border-color: #e8eaed;
+  box-shadow: 0 0.5rem 1.1rem rgb(0 0 0 / 52%);
+}
+
+:global(:root[data-theme="dark"]) .flowCardAvailable:not(.flowCardCompleted) {
+  border-left-color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .flowLegend .flowLegendPrerequisite,
+:global(:root[data-theme="dark"]) .flowCard.flowCardPrerequisite {
+  border-color: var(--flow-prerequisite);
+  border-style: dashed;
+  background: var(--flow-prerequisite-background);
+}
+
+:global(:root[data-theme="dark"]) .flowLegend .flowLegendUnlock,
+:global(:root[data-theme="dark"]) .flowCard.flowCardUnlock {
+  border-color: var(--flow-unlock);
+  border-style: double;
+  background: var(--flow-unlock-background);
+}
+
+:global(:root[data-theme="dark"]) .flowLegend .flowLegendUnlock {
+  border-width: 3px;
+}
+
+:global(:root[data-theme="dark"]) .flowCard.flowCardUnlock {
+  border-width: 3px;
+}
+
+:global(:root[data-theme="dark"]) .flowLegend .flowLegendCorequisite,
+:global(:root[data-theme="dark"]) .flowCard.flowCardCorequisite {
+  border-color: var(--flow-corequisite);
+  border-style: dotted;
+  border-width: 2px;
+  background: var(--flow-corequisite-background);
+}
+
+:global(:root[data-theme="dark"]) .flowCard.flowCardPrerequisite,
+:global(:root[data-theme="dark"]) .flowCard.flowCardUnlock,
+:global(:root[data-theme="dark"]) .flowCard.flowCardCorequisite {
+  box-shadow: none;
+}
+
+:global(:root[data-theme="dark"]) .flowCard.flowCardSelected {
+  border-color: #ffffff;
+  background: #2a2a2a;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 38%);
+}
+
+:global(:root[data-theme="dark"]) .flowLegend .flowLegendCompleted {
+  border-color: #ffffff;
+  background: repeating-linear-gradient(
+    135deg,
+    #ffffff 0 2px,
+    #1f1f1f 2px 5px
+  );
+}
+
+:global(:root[data-theme="dark"]) .flowCardCompleted:not(.flowCardSelected) {
+  border-color: #e8eaed;
+  background: repeating-linear-gradient(
+    135deg,
+    #242424 0 5px,
+    #1f1f1f 5px 10px
+  );
+}
+
+:global(:root[data-theme="dark"]) .flowStatus {
+  border: 1px solid #5f6368;
+}
+
+:global(:root[data-theme="dark"]) .flowStatusCompleted {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #121212;
+}
+
+:global(:root[data-theme="dark"]) .flowStatusAvailable {
+  border-color: #bdc1c6;
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .flowStatusCorequisite {
+  border-color: #bdc1c6;
+  border-style: dotted;
+  background: #181818;
+  color: #e8eaed;
+}
+
+:global(:root[data-theme="dark"]) .flowStatusBlocked {
+  border-style: dashed;
+  background: #151515;
+  color: #bdc1c6;
+}
+
+:global(:root[data-theme="dark"]) .flowRelationBadgePrerequisite {
+  color: #ffffff;
+  text-decoration: underline dashed;
+  text-underline-offset: 0.22em;
+}
+
+:global(:root[data-theme="dark"]) .flowRelationBadgeUnlock {
+  color: #d5d5d5;
+  text-decoration: underline double;
+  text-underline-offset: 0.22em;
+}
+
+:global(:root[data-theme="dark"]) .flowRelationBadgeCorequisite {
+  color: #bdc1c6;
+  text-decoration: underline dotted;
+  text-underline-offset: 0.22em;
+}
+
+:global(:root[data-theme="dark"]) .flowCheckbox,
+:global(:root[data-theme="dark"]) .flowDetailsCompletion input {
+  accent-color: #ffffff;
+}
+
+:global(:root[data-theme="dark"]) .flowPeriods {
+  scrollbar-color: #ffffff #181818;
+}
+
+:global(:root[data-theme="dark"]) .flowPeriods::-webkit-scrollbar-thumb {
+  border-color: #181818;
+  background: #ffffff;
+}
+
 @media (max-width: 720px) {
   .flowIntro {
     grid-template-columns: 1fr;
@@ -492,15 +983,59 @@
   }
 
   .flowSearchField,
-  .flowCompactRelations {
+  .flowLegend {
     width: 100%;
     max-width: none;
   }
 
   .flowSearchResult,
-  .flowCompactRelations {
+  .flowLegend {
     padding-bottom: 0;
     text-align: left;
+  }
+
+  .flowControls {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .flowModeGroup {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .flowLegend {
+    justify-content: flex-start;
+  }
+
+  .flowResetButton {
+    width: fit-content;
+  }
+
+  .flowPeriods {
+    grid-auto-columns: min(82vw, 17rem);
+  }
+
+  .flowSummary,
+  .flowDetails,
+  .flowCard,
+  .flowCard.flowCardPrerequisite,
+  .flowCard.flowCardUnlock,
+  .flowCard.flowCardCorequisite,
+  .flowCard.flowCardSelected,
+  :global(:root[data-theme="dark"]) .flowSummary,
+  :global(:root[data-theme="dark"]) .flowDetails,
+  :global(:root[data-theme="dark"]) .flowCard,
+  :global(:root[data-theme="dark"]) .flowCard:hover,
+  :global(:root[data-theme="dark"]) .flowCard.flowCardSelected {
+    box-shadow: none;
+  }
+
+  .flowCard,
+  .flowCourseField select,
+  .flowSearchField input {
+    transition: none;
   }
 
   .flowRelationships {
@@ -509,6 +1044,19 @@
 
   .flowDetailsCompletion {
     width: fit-content;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .flowCard:hover {
+    border-color: #9dbbc9;
+    box-shadow: 0 0.45rem 1rem rgb(25 59 79 / 9%);
+    transform: translateY(-1px);
+  }
+
+  :global(:root[data-theme="dark"]) .flowCard:hover {
+    border-color: #e8eaed;
+    box-shadow: 0 0.5rem 1.1rem rgb(0 0 0 / 52%);
   }
 }
 

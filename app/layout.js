@@ -2,6 +2,7 @@ import { Open_Sans } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
+import { INITIAL_THEME_SCRIPT } from '@/lib/theme';
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -47,7 +48,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR" className={openSans.variable}>
+    <html
+      className={openSans.variable}
+      data-scroll-behavior="smooth"
+      lang="pt-BR"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INITIAL_THEME_SCRIPT }} />
+      </head>
       <body>
         <SiteHeader />
         <main id="conteudo-principal">{children}</main>

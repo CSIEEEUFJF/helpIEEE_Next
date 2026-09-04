@@ -1,15 +1,12 @@
 import Link from 'next/link';
-import CurriculumExplorer from '@/components/CurriculumExplorer';
+import FlowCurriculumExplorer from '@/components/FlowCurriculumExplorer';
 
 export const metadata = {
   title: 'Fluxo curricular',
-  description: 'Explore períodos, pré-requisitos e progresso em grades de Exatas e Engenharias da UFJF.',
+  description: 'Explore períodos, pré-requisitos e progresso nas 15 ofertas presenciais do ICE e em grades de Engenharias da UFJF.',
 };
 
-export default async function FlowPage({ searchParams }) {
-  const params = await searchParams;
-  const initialCourse = typeof params?.curso === 'string' ? params.curso : undefined;
-
+export default function FlowPage() {
   return (
     <div className="flow-page">
       <div className="flow-page__intro">
@@ -18,10 +15,7 @@ export default async function FlowPage({ searchParams }) {
         </div>
       </div>
       <div className="container flow-app">
-        <CurriculumExplorer initialCourse={initialCourse} />
-        <div className="flow-disclaimer">
-          <strong>Use como apoio ao planejamento.</strong> Grades e pré-requisitos podem mudar. Confirme decisões de matrícula no SIGA e com a coordenação do seu curso.
-        </div>
+        <FlowCurriculumExplorer />
       </div>
     </div>
   );

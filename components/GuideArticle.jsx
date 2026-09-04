@@ -19,8 +19,6 @@ function ResourceLink({ link }) {
 }
 
 export function GuideArticle({ guide, nextGuide }) {
-  const reviewedAt = formatReviewDate(guide.reviewedAt);
-
   return (
     <>
       <header className="page-hero">
@@ -33,10 +31,11 @@ export function GuideArticle({ guide, nextGuide }) {
           <span className="eyebrow">{guide.eyebrow}</span>
           <h1>{guide.title}</h1>
           <p>{guide.summary}</p>
-          <div className="article-scope">
-            {guide.audience ? <span>{guide.audience}</span> : null}
-            {guide.scope ? <span>{guide.scope}</span> : null}
-          </div>
+          {guide.audience ? (
+            <div className="article-audience">
+              <span>{guide.audience}</span>
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -46,11 +45,6 @@ export function GuideArticle({ guide, nextGuide }) {
           <nav aria-label={`Seções de ${guide.title}`}>
             {guide.sections.map((section) => <a href={`#${section.id}`} key={section.id}>{section.title}</a>)}
           </nav>
-          <div className="article-trust">
-            <strong>Conteúdo revisado</strong>
-            {reviewedAt ? <span>{reviewedAt}</span> : null}
-            {guide.sourceLabel ? <span>Base: {guide.sourceLabel}</span> : null}
-          </div>
         </aside>
 
         <article className="article-content">

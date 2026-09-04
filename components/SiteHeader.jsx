@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HeaderToneController } from '@/components/HeaderToneController';
 import { MobileNavigation } from '@/components/MobileNavigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { PRIMARY_CTA, SITE_NAVIGATION } from '@/components/siteNavigation';
@@ -11,6 +12,7 @@ export function SiteHeader() {
       </a>
 
       <header className="site-header">
+        <HeaderToneController />
         <div className="site-header__institutional">
           <div className="site-container site-header__institutional-inner">
             <span>Um projeto feito por estudantes para estudantes</span>

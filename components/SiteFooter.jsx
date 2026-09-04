@@ -32,20 +32,6 @@ export function SiteFooter() {
           </ul>
         </nav>
 
-        <section className="site-footer__editorial" aria-labelledby="footer-editorial-title">
-          <h2 className="site-footer__title" id="footer-editorial-title">
-            Transparência editorial
-          </h2>
-          <p>
-            O conteúdo é organizado por estudantes, com base em fontes oficiais da
-            UFJF. Materiais identificam sua fonte e a data da última revisão.
-          </p>
-          <Link className="site-footer__text-link" href="/guia/projeto#metodologia">
-            Conheça nossa metodologia
-            <span aria-hidden="true"> →</span>
-          </Link>
-        </section>
-
         <section className="site-footer__ieee" aria-labelledby="footer-ieee-title">
           <h2 className="site-footer__title" id="footer-ieee-title">IEEE UFJF</h2>
           <p>
@@ -59,7 +45,7 @@ export function SiteFooter() {
             rel="noreferrer"
           >
             Visite o site do Ramo
-            <span aria-hidden="true"> ↗</span>
+            <span aria-hidden="true">↗</span>
           </a>
         </section>
       </div>

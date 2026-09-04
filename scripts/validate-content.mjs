@@ -32,11 +32,13 @@ const REQUIRED_GUIDE_FIELDS = [
   'sourceLabel',
 ];
 const REQUIRED_CURRICULUM_FIELDS = [
+  'group',
   'title',
   'subtitle',
   'unitShort',
   'unitLong',
   'valueLabel',
+  'sourceUrl',
 ];
 const STATIC_INTERNAL_PATHS = new Set([
   '/',
@@ -436,8 +438,8 @@ function validateCurricula() {
   }
 
   const curricula = Object.entries(FLOW_CURRICULA);
-  if (curricula.length !== 10) {
-    report('FLOW_CURRICULA', `deve conter exatamente 10 grades; encontrou ${curricula.length}`);
+  if (curricula.length !== 21) {
+    report('FLOW_CURRICULA', `deve conter exatamente 21 grades; encontrou ${curricula.length}`);
   }
 
   const curriculumTitles = [];
@@ -454,6 +456,23 @@ function validateCurricula() {
     }
 
     requireText(curriculum, REQUIRED_CURRICULUM_FIELDS, curriculumLocation);
+    if (!['Cursos do ICE', 'Engenharias'].includes(curriculum.group)) {
+      report(`${curriculumLocation}.group`, 'grupo deve ser "Cursos do ICE" ou "Engenharias"');
+    }
+    validateExternalHref(curriculum.sourceUrl, `${curriculumLocation}.sourceUrl`);
+    if (isNonEmptyString(curriculum.sourceUrl)) {
+      try {
+        const sourceUrl = new URL(curriculum.sourceUrl);
+        if (
+          sourceUrl.hostname !== 'ufjf.br'
+          && !sourceUrl.hostname.endsWith('.ufjf.br')
+        ) {
+          report(`${curriculumLocation}.sourceUrl`, 'fonte da grade deve estar em domínio oficial da UFJF');
+        }
+      } catch {
+        // A URL inválida já é relatada por validateExternalHref.
+      }
+    }
     curriculumTitles.push({ value: curriculum.title, location: `${curriculumLocation}.title` });
     const periods = requireArray(curriculum, 'periods', curriculumLocation);
     const courses = [];
@@ -468,22 +487,32 @@ function validateCurricula() {
       period.forEach((course, courseIndex) => {
         courseCount += 1;
         const courseLocation = `${periodLocation}[${courseIndex}]`;
-        if (!Array.isArray(course) || course.length < 3 || course.length > 4) {
-          report(courseLocation, 'disciplina deve ter [código, nome, carga/créditos, pré-requisitos?]');
+        if (!Array.isArray(course) || course.length < 3 || course.length > 5) {
+          report(
+            courseLocation,
+            'disciplina deve ter [código, nome, carga/créditos, pré-requisitos?, correquisitos?]',
+          );
           return;
         }
 
-        const [code, title, value, prerequisites] = course;
+        const [code, title, value, prerequisites, corequisites] = course;
         if (!isNonEmptyString(code)) report(`${courseLocation}[0]`, 'código é obrigatório');
         if (!isNonEmptyString(title)) report(`${courseLocation}[1]`, 'nome é obrigatório');
         if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) {
           report(`${courseLocation}[2]`, 'carga/créditos deve ser um número não negativo');
         }
-        if (prerequisites !== undefined && !isNonEmptyString(prerequisites)) {
+        if (
+          prerequisites !== undefined
+          && !isNonEmptyString(prerequisites)
+          && corequisites === undefined
+        ) {
           report(`${courseLocation}[3]`, 'pré-requisitos devem ser códigos separados por |');
         }
+        if (corequisites !== undefined && !isNonEmptyString(corequisites)) {
+          report(`${courseLocation}[4]`, 'correquisitos devem ser códigos separados por |');
+        }
 
-        courses.push({ code, prerequisites, location: courseLocation });
+        courses.push({ code, corequisites, prerequisites, location: courseLocation });
       });
     });
 
@@ -495,26 +524,64 @@ function validateCurricula() {
     const knownCodes = new Set(
       courses.filter(({ code }) => isNonEmptyString(code)).map(({ code }) => normalize(code)),
     );
-    courses.forEach(({ code, prerequisites, location }) => {
-      if (!isNonEmptyString(prerequisites)) return;
+    courses.forEach(({ code, corequisites, prerequisites, location }) => {
+      const relationships = [
+        {
+          codes: isNonEmptyString(prerequisites)
+            ? prerequisites.split('|').map((entry) => entry.trim())
+            : [],
+          fieldIndex: 3,
+          pluralLabel: 'pré-requisitos',
+          singularLabel: 'pré-requisito',
+        },
+        {
+          codes: isNonEmptyString(corequisites)
+            ? corequisites.split('|').map((entry) => entry.trim())
+            : [],
+          fieldIndex: 4,
+          pluralLabel: 'correquisitos',
+          singularLabel: 'correquisito',
+        },
+      ];
 
-      const prerequisiteCodes = prerequisites.split('|').map((entry) => entry.trim());
-      if (prerequisiteCodes.some((entry) => !entry)) {
-        report(`${location}[3]`, 'lista de pré-requisitos contém código vazio');
+      for (const relationship of relationships) {
+        const fieldLocation = `${location}[${relationship.fieldIndex}]`;
+
+        if (relationship.codes.some((entry) => !entry)) {
+          report(
+            fieldLocation,
+            `lista de ${relationship.pluralLabel} contém código vazio`,
+          );
+        }
+
+        validateUniqueValues(
+          relationship.codes.map((value) => ({ value, location: fieldLocation })),
+          `${relationship.singularLabel} de ${code}`,
+        );
+
+        relationship.codes.filter(isNonEmptyString).forEach((relationshipCode) => {
+          if (isNonEmptyString(code) && normalize(relationshipCode) === normalize(code)) {
+            report(
+              fieldLocation,
+              `${code} não pode ser ${relationship.singularLabel} de si mesma`,
+            );
+          } else if (!knownCodes.has(normalize(relationshipCode))) {
+            report(
+              fieldLocation,
+              `${relationship.singularLabel} ${relationshipCode} de ${code} não existe na grade ${curriculumId}`,
+            );
+          }
+        });
       }
 
-      validateUniqueValues(
-        prerequisiteCodes.map((value) => ({ value, location: `${location}[3]` })),
-        `pré-requisito de ${code}`,
+      const prerequisiteCodes = new Set(
+        relationships[0].codes.filter(isNonEmptyString).map(normalize),
       );
-
-      prerequisiteCodes.filter(isNonEmptyString).forEach((prerequisiteCode) => {
-        if (isNonEmptyString(code) && normalize(prerequisiteCode) === normalize(code)) {
-          report(`${location}[3]`, `${code} não pode ser pré-requisito de si mesma`);
-        } else if (!knownCodes.has(normalize(prerequisiteCode))) {
+      relationships[1].codes.filter(isNonEmptyString).forEach((corequisiteCode) => {
+        if (prerequisiteCodes.has(normalize(corequisiteCode))) {
           report(
-            `${location}[3]`,
-            `pré-requisito ${prerequisiteCode} de ${code} não existe na grade ${curriculumId}`,
+            `${location}[4]`,
+            `${corequisiteCode} não pode ser simultaneamente pré-requisito e correquisito de ${code}`,
           );
         }
       });

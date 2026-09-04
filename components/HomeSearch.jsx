@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 
 function normalize(value) {
   return value
@@ -13,12 +13,15 @@ function normalize(value) {
 
 export function HomeSearch({ entries }) {
   const [query, setQuery] = useState('');
-  const normalizedQuery = normalize(query);
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = normalize(deferredQuery);
   const results = useMemo(() => {
     if (!normalizedQuery) return [];
     const tokens = normalizedQuery.split(/\s+/);
     return entries
-      .filter((entry) => tokens.every((token) => normalize(`${entry.title} ${entry.summary} ${entry.keywords ?? ''}`).includes(token)))
+      .filter((entry) =>
+        tokens.every((token) => entry.searchText.includes(token)),
+      )
       .slice(0, 6);
   }, [entries, normalizedQuery]);
 
