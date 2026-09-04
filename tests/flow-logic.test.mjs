@@ -7,6 +7,10 @@ import {
   curricula,
   curriculumKeys,
 } from "../lib/curricula.js";
+import {
+  buildCurriculumArrowEdges,
+  buildCurriculumArrowPath,
+} from "../lib/curriculum-arrows.js";
 import { shouldUseIeeeBlueHeader } from "../lib/header-tone.js";
 
 const componentSource = readFileSync(
@@ -15,6 +19,10 @@ const componentSource = readFileSync(
 );
 const recoveryPlannerSource = readFileSync(
   new URL("../components/RecoveryPlanner.jsx", import.meta.url),
+  "utf8",
+);
+const curriculumArrowsSource = readFileSync(
+  new URL("../components/CurriculumArrows.jsx", import.meta.url),
   "utf8",
 );
 const globalStylesSource = readFileSync(
@@ -1041,6 +1049,96 @@ test("grade permite arrastar horizontalmente sem acionar cartões", () => {
   assert.ok(draggingRule, "estado visual de arraste deve existir");
   assert.match(draggingRule, /cursor:\s*grabbing/);
   assert.match(draggingRule, /user-select:\s*none/);
+});
+
+test("setas ligam pré-requisitos às matérias dependentes", () => {
+  const { logic } = createLogicHarness();
+  const curriculum = logic.hydratedCurricula["quimica-bacharelado-diurno"];
+  const visibleCodes = new Set(
+    curriculum.disciplines.map(({ code }) => code),
+  );
+  const directEdges = buildCurriculumArrowEdges(
+    curriculum,
+    "QUI094",
+    visibleCodes,
+    { directOnly: true },
+  );
+
+  assert.deepEqual(
+    directEdges
+      .map(({ from, relation, to }) => `${from}->${to}:${relation}`)
+      .sort(),
+    [
+      "QUI094->QUI093:unlock",
+      "QUI094->QUI110:unlock",
+      "QUI094->QUI128:unlock",
+      "QUI189->QUI094:prerequisite",
+      "QUI191->QUI094:prerequisite",
+    ].sort(),
+  );
+  assert.deepEqual(
+    buildCurriculumArrowEdges(
+      curriculum,
+      "QUI094",
+      new Set(["QUI094", "QUI189"]),
+      { directOnly: true },
+    ),
+    [{ from: "QUI189", relation: "prerequisite", to: "QUI094" }],
+  );
+  assert.deepEqual(
+    buildCurriculumArrowEdges(curriculum, null, visibleCodes, {
+      directOnly: true,
+    }),
+    [],
+  );
+});
+
+test("ponta da seta termina na borda da matéria de destino", () => {
+  const source = { bottom: 70, left: 10, right: 110, top: 20 };
+  const targetOnRight = { bottom: 90, left: 230, right: 330, top: 30 };
+  const targetOnLeft = { bottom: 150, left: -150, right: -50, top: 100 };
+  const targetInSameColumn = { bottom: 190, left: 20, right: 120, top: 150 };
+  const forwardPath = buildCurriculumArrowPath(source, targetOnRight);
+  const reversePath = buildCurriculumArrowPath(source, targetOnLeft);
+  const sameColumnPath = buildCurriculumArrowPath(
+    source,
+    targetInSameColumn,
+  );
+
+  assert.deepEqual(forwardPath.end, { x: 228, y: 60 });
+  assert.deepEqual(reversePath.end, { x: -48, y: 125 });
+  assert.deepEqual(sameColumnPath.end, { x: 122, y: 170 });
+  assert.doesNotMatch(forwardPath.d, /NaN|undefined/);
+  assert.doesNotMatch(reversePath.d, /NaN|undefined/);
+  assert.doesNotMatch(sameColumnPath.d, /NaN|undefined/);
+  assert.equal(
+    buildCurriculumArrowPath(source, {
+      bottom: 0,
+      left: 0,
+      right: 0,
+      top: 0,
+    }),
+    null,
+  );
+});
+
+test("camada de setas acompanha o canvas sem bloquear scroll ou clique", () => {
+  const arrowRule = curriculumStylesSource.match(
+    /\.flowArrows\s*\{[^}]*\}/,
+  )?.[0];
+
+  assert.match(componentSource, /aria-pressed=\{showArrows\}/);
+  assert.match(componentSource, /<CurriculumArrows/);
+  assert.match(componentSource, /className=\{styles\.flowCanvas\}/);
+  assert.match(curriculumArrowsSource, /aria-hidden="true"/);
+  assert.match(curriculumArrowsSource, /focusable="false"/);
+  assert.match(curriculumArrowsSource, /marker-end/);
+  assert.match(curriculumArrowsSource, /window\.requestAnimationFrame\(/);
+  assert.match(curriculumArrowsSource, /directOnly:\s*coarsePointer\.matches/);
+  assert.doesNotMatch(curriculumArrowsSource, /addEventListener\("scroll"/);
+  assert.ok(arrowRule, "regra do SVG de setas deve existir");
+  assert.match(arrowRule, /position:\s*absolute/);
+  assert.match(arrowRule, /pointer-events:\s*none/);
 });
 
 test("grade posterga trabalho e pintura fora da tela em celulares", () => {

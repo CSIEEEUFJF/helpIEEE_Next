@@ -205,7 +205,8 @@
 }
 
 .flowModeGroup button,
-.flowResetButton {
+.flowResetButton,
+.flowArrowToggle {
   min-height: 2.45rem;
   border-radius: 0.3rem;
   font: inherit;
@@ -243,7 +244,16 @@
   line-height: 1.45;
 }
 
-.flowResetButton {
+.flowControlActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.flowResetButton,
+.flowArrowToggle {
   margin-bottom: 0.1rem;
   padding: 0.55rem 0.8rem;
   border: 1px solid var(--flow-border);
@@ -251,8 +261,26 @@
   color: var(--flow-blue-dark);
 }
 
+.flowArrowToggle {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.flowArrowToggle span {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.flowArrowToggle[aria-pressed="true"] {
+  border-color: var(--flow-blue);
+  background: var(--flow-blue-soft);
+}
+
 .flowResetButton:hover:not(:disabled),
-.flowResetButton:focus-visible:not(:disabled) {
+.flowResetButton:focus-visible:not(:disabled),
+.flowArrowToggle:hover,
+.flowArrowToggle:focus-visible {
   border-color: var(--flow-blue);
   background: var(--flow-blue-soft);
 }
@@ -392,16 +420,10 @@
 }
 
 .flowPeriods {
-  display: grid;
-  grid-auto-columns: clamp(15.5rem, 22vw, 17.5rem);
-  grid-auto-flow: column;
-  grid-template-rows: auto;
-  gap: 1rem;
-  align-items: start;
+  display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  padding: 1rem 0.2rem 1.1rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-inline: contain;
@@ -409,6 +431,19 @@
   scrollbar-color: var(--flow-blue) var(--flow-page);
   scrollbar-gutter: stable;
   scrollbar-width: auto;
+}
+
+.flowCanvas {
+  position: relative;
+  display: grid;
+  grid-auto-columns: clamp(15.5rem, 22vw, 17.5rem);
+  grid-auto-flow: column;
+  grid-template-rows: auto;
+  gap: 1rem;
+  align-items: start;
+  width: max-content;
+  min-width: 100%;
+  padding: 1rem 0.2rem 1.1rem;
 }
 
 .flowPeriods[data-dragging="true"] {
@@ -451,7 +486,65 @@
   background: var(--flow-page);
 }
 
+.flowArrows {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.flowArrowLine {
+  fill: none;
+  stroke: color-mix(in srgb, var(--flow-blue) 34%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.flowArrowPrerequisite {
+  stroke: var(--flow-prerequisite);
+  stroke-width: 2.25;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+.flowArrowUnlock {
+  stroke: var(--flow-unlock);
+  stroke-width: 2.25;
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+.flowArrowDimmed {
+  opacity: 0.055;
+}
+
+.flowArrowMarkerDefault,
+.flowArrowMarkerPrerequisite,
+.flowArrowMarkerUnlock {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.flowArrowMarkerDefault {
+  stroke: color-mix(in srgb, var(--flow-blue) 48%, transparent);
+}
+
+.flowArrowMarkerPrerequisite {
+  stroke: var(--flow-prerequisite);
+}
+
+.flowArrowMarkerUnlock {
+  stroke: var(--flow-unlock);
+}
+
 .flowPeriodHeader {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 0.75rem;
   align-items: baseline;
@@ -487,6 +580,8 @@
 }
 
 .flowCard {
+  position: relative;
+  z-index: 2;
   overflow: hidden;
   border: 1px solid var(--flow-border);
   border-radius: 0.45rem;
@@ -825,6 +920,7 @@
 :global(:root[data-theme="dark"]) .flowModeGroup button:hover,
 :global(:root[data-theme="dark"]) .flowModeGroup button:focus-visible,
 :global(:root[data-theme="dark"]) .flowResetButton,
+:global(:root[data-theme="dark"]) .flowArrowToggle,
 :global(:root[data-theme="dark"]) .flowOfficialSource,
 :global(:root[data-theme="dark"]) .flowPeriodHeader h3,
 :global(:root[data-theme="dark"]) .flowCode,
@@ -834,9 +930,17 @@
 
 :global(:root[data-theme="dark"]) .flowResetButton:hover:not(:disabled),
 :global(:root[data-theme="dark"]) .flowResetButton:focus-visible:not(:disabled),
+:global(:root[data-theme="dark"]) .flowArrowToggle:hover,
+:global(:root[data-theme="dark"]) .flowArrowToggle:focus-visible,
 :global(:root[data-theme="dark"]) .flowRelationButton:hover {
   border-color: #ffffff;
   background: #2a2a2a;
+}
+
+:global(:root[data-theme="dark"]) .flowArrowToggle[aria-pressed="true"] {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #121212;
 }
 
 :global(:root[data-theme="dark"]) .flowCard:hover {
@@ -1009,11 +1113,16 @@
     justify-content: flex-start;
   }
 
-  .flowResetButton {
+  .flowControlActions {
+    justify-content: flex-start;
+  }
+
+  .flowResetButton,
+  .flowArrowToggle {
     width: fit-content;
   }
 
-  .flowPeriods {
+  .flowCanvas {
     grid-auto-columns: min(82vw, 17rem);
   }
 
@@ -1047,7 +1156,20 @@
   }
 }
 
+@media (forced-colors: active) {
+  .flowArrowLine,
+  .flowArrowMarkerDefault,
+  .flowArrowMarkerPrerequisite,
+  .flowArrowMarkerUnlock {
+    stroke: CanvasText;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
+  .flowCanvas[data-arrows-visible="true"] .flowPeriod {
+    content-visibility: visible;
+  }
+
   .flowCard:hover {
     border-color: #9dbbc9;
     box-shadow: 0 0.45rem 1rem rgb(25 59 79 / 9%);

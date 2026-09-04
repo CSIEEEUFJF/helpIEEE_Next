@@ -14,6 +14,7 @@ import {
 import { curricula, curriculumKeys } from "@/lib/curricula";
 
 import styles from "./CurriculumExplorer.module.css";
+import CurriculumArrows from "./CurriculumArrows";
 import RecoveryPlanner from "./RecoveryPlanner";
 
 const STORAGE_KEY = "helpieee:curriculum-progress:v1";
@@ -425,6 +426,14 @@ const DisciplineCard = memo(function DisciplineCard({
   const isCompleted = completedCodes.has(discipline.code);
   const isAvailable = missingPrerequisites.length === 0;
   const showCompletionControl = interactionMode === "complete";
+  const relationLabel =
+    relation === "prerequisite"
+      ? "pré-requisito direto"
+      : relation === "corequisite"
+        ? "correquisito"
+        : relation === "unlock"
+          ? "disciplina desbloqueada"
+          : "";
   const status = isCompleted
     ? "Concluída"
     : isAvailable
@@ -473,7 +482,9 @@ const DisciplineCard = memo(function DisciplineCard({
             : isSelected
               ? "Fechar relações de"
               : "Explorar relações de"
-        } ${discipline.code} — ${discipline.name} — ${status}`}
+        } ${discipline.code} — ${discipline.name} — ${status}${
+          relationLabel ? ` — ${relationLabel}` : ""
+        }`}
         aria-pressed={
           interactionMode === "complete" ? isCompleted : isSelected
         }
@@ -572,10 +583,12 @@ export default function CurriculumExplorer({ initialCourse }) {
   const searchId = useId();
   const flowScrollHintId = useId();
   const periodsRef = useRef(null);
+  const periodsCanvasRef = useRef(null);
   const periodsDragRef = useRef(null);
   const suppressPeriodsClickRef = useRef(false);
   const [activeCourseKey, setActiveCourseKey] = useState(initialCourseKey);
   const [interactionMode, setInteractionMode] = useState("explore");
+  const [showArrows, setShowArrows] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCode, setSelectedCode] = useState(null);
   const completedByCourse = useSyncExternalStore(
@@ -610,6 +623,15 @@ export default function CurriculumExplorer({ initialCourse }) {
   const visibleDisciplineCount = filteredPeriods.reduce(
     (total, period) => total + period.disciplines.length,
     0,
+  );
+  const visibleCodes = useMemo(
+    () =>
+      new Set(
+        filteredPeriods.flatMap(({ disciplines }) =>
+          disciplines.map(({ code }) => code),
+        ),
+      ),
+    [filteredPeriods],
   );
   const completedDisciplines = activeCurriculum.disciplines.filter(
     ({ code }) => completedCodes.has(code),
@@ -910,14 +932,30 @@ export default function CurriculumExplorer({ initialCourse }) {
             ? "Selecione uma disciplina para destacar o que vem antes e depois dela."
             : "Clique nos cartões para registrar rapidamente as disciplinas concluídas."}
         </p>
-        <button
-          className={styles.flowResetButton}
-          disabled={completedCount === 0}
-          onClick={handleResetProgress}
-          type="button"
-        >
-          Limpar progresso desta grade
-        </button>
+        <div className={styles.flowControlActions}>
+          <button
+            aria-label={
+              showArrows
+                ? "Ocultar setas entre as matérias"
+                : "Mostrar setas entre as matérias"
+            }
+            aria-pressed={showArrows}
+            className={styles.flowArrowToggle}
+            onClick={() => setShowArrows((currentValue) => !currentValue)}
+            type="button"
+          >
+            <span aria-hidden="true">→</span>
+            {showArrows ? "Setas visíveis" : "Mostrar setas"}
+          </button>
+          <button
+            className={styles.flowResetButton}
+            disabled={completedCount === 0}
+            onClick={handleResetProgress}
+            type="button"
+          >
+            Limpar progresso desta grade
+          </button>
+        </div>
       </div>
 
       <div className={styles.flowToolbar}>
@@ -975,7 +1013,8 @@ export default function CurriculumExplorer({ initialCourse }) {
           <p className={styles.flowHorizontalHint} id={flowScrollHintId}>
             <span aria-hidden="true">↔</span>
             Todos os períodos estão lado a lado. Arraste, deslize ou use a
-            barra de rolagem horizontal para percorrer a grade.
+            barra de rolagem horizontal para percorrer a grade. Selecione uma
+            matéria para destacar suas setas.
           </p>
           <div
             aria-describedby={flowScrollHintId}
@@ -992,57 +1031,73 @@ export default function CurriculumExplorer({ initialCourse }) {
             role="region"
             tabIndex={0}
           >
-            {filteredPeriods.map((period) => (
-              <section
-                aria-labelledby={`flow-period-${activeCourseKey}-${period.number}`}
-                className={styles.flowPeriod}
-                key={period.number}
-              >
-                <header className={styles.flowPeriodHeader}>
-                  <h3 id={`flow-period-${activeCourseKey}-${period.number}`}>
-                    {period.number}º período
-                  </h3>
-                  <span>
-                    {period.disciplines.length}{" "}
-                    {pluralize(
-                      period.disciplines.length,
-                      "disciplina",
-                      "disciplinas",
+            <div
+              className={styles.flowCanvas}
+              data-arrows-visible={showArrows ? "true" : undefined}
+              ref={periodsCanvasRef}
+            >
+              {showArrows ? (
+                <CurriculumArrows
+                  canvasRef={periodsCanvasRef}
+                  courseKey={activeCourseKey}
+                  curriculum={activeCurriculum}
+                  layoutKey={`${interactionMode}:${selectedCode ?? ""}:${completedCount}:${normalizedSearch}`}
+                  selectedCode={selectedCode}
+                  visibleCodes={visibleCodes}
+                />
+              ) : null}
+              {filteredPeriods.map((period) => (
+                <section
+                  aria-labelledby={`flow-period-${activeCourseKey}-${period.number}`}
+                  className={styles.flowPeriod}
+                  key={period.number}
+                >
+                  <header className={styles.flowPeriodHeader}>
+                    <h3 id={`flow-period-${activeCourseKey}-${period.number}`}>
+                      {period.number}º período
+                    </h3>
+                    <span>
+                      {period.disciplines.length}{" "}
+                      {pluralize(
+                        period.disciplines.length,
+                        "disciplina",
+                        "disciplinas",
+                      )}
+                    </span>
+                  </header>
+                  <div className={styles.flowPeriodCards}>
+                    {period.disciplines.length > 0 ? (
+                      period.disciplines.map((discipline) => (
+                        <DisciplineCard
+                          completedCodes={completedCodes}
+                          discipline={discipline}
+                          elementId={`flow-discipline-${activeCourseKey}-${discipline.code}`}
+                          interactionMode={interactionMode}
+                          isSelected={selectedCode === discipline.code}
+                          key={discipline.code}
+                          onSelect={handleSelectDiscipline}
+                          onToggleCompleted={handleToggleCompleted}
+                          relation={
+                            selectedPrerequisiteCodes.has(discipline.code)
+                              ? "prerequisite"
+                              : selectedCorequisiteCodes.has(discipline.code)
+                                ? "corequisite"
+                                : selectedUnlockCodes.has(discipline.code)
+                                  ? "unlock"
+                                  : null
+                          }
+                          unitShort={activeCurriculum.unitShort}
+                        />
+                      ))
+                    ) : (
+                      <p className={styles.flowPeriodEmpty}>
+                        Sem correspondências neste período.
+                      </p>
                     )}
-                  </span>
-                </header>
-                <div className={styles.flowPeriodCards}>
-                  {period.disciplines.length > 0 ? (
-                    period.disciplines.map((discipline) => (
-                      <DisciplineCard
-                        completedCodes={completedCodes}
-                        discipline={discipline}
-                        elementId={`flow-discipline-${activeCourseKey}-${discipline.code}`}
-                        interactionMode={interactionMode}
-                        isSelected={selectedCode === discipline.code}
-                        key={discipline.code}
-                        onSelect={handleSelectDiscipline}
-                        onToggleCompleted={handleToggleCompleted}
-                        relation={
-                          selectedPrerequisiteCodes.has(discipline.code)
-                            ? "prerequisite"
-                            : selectedCorequisiteCodes.has(discipline.code)
-                              ? "corequisite"
-                              : selectedUnlockCodes.has(discipline.code)
-                                ? "unlock"
-                                : null
-                        }
-                        unitShort={activeCurriculum.unitShort}
-                      />
-                    ))
-                  ) : (
-                    <p className={styles.flowPeriodEmpty}>
-                      Sem correspondências neste período.
-                    </p>
-                  )}
-                </div>
-              </section>
-            ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
         </>
       ) : (
