@@ -5,9 +5,10 @@
 // para que a saída deste validador contenha apenas resultados acionáveis.
 process.removeAllListeners('warning');
 
-const [guideModule, curriculumModule] = await Promise.all([
+const [guideModule, curriculumModule, electiveModule] = await Promise.all([
   import('../lib/guides.js'),
   import('../lib/curricula.js'),
+  import('../lib/electives/manifest.js'),
 ]);
 
 const {
@@ -18,6 +19,11 @@ const {
   officialLinks,
 } = guideModule;
 const { FLOW_CURRICULA } = curriculumModule;
+const {
+  ELECTIVE_CATALOG_META,
+  electiveCatalogKeys,
+  loadElectiveCatalog,
+} = electiveModule;
 
 const errors = [];
 const URL_BASE = 'https://helpieee.local';
@@ -592,8 +598,159 @@ function validateCurricula() {
   return { curriculumCount: curricula.length, courseCount };
 }
 
+function validateOfficialAcademicUrl(value, location) {
+  validateExternalHref(value, location);
+
+  if (!isNonEmptyString(value)) return;
+
+  try {
+    const { hostname } = new URL(value);
+    const isUfjfDomain = hostname === 'ufjf.br' || hostname.endsWith('.ufjf.br');
+    const isGoogleDocument = hostname === 'docs.google.com';
+
+    if (!isUfjfDomain && !isGoogleDocument) {
+      report(location, 'fonte acadêmica deve estar em domínio oficial da UFJF');
+    }
+  } catch {
+    // A URL inválida já é relatada por validateExternalHref.
+  }
+}
+
+async function validateElectives() {
+  if (
+    !ELECTIVE_CATALOG_META
+    || typeof ELECTIVE_CATALOG_META !== 'object'
+    || Array.isArray(ELECTIVE_CATALOG_META)
+  ) {
+    report('ELECTIVE_CATALOG_META', 'deve exportar os metadados por curso');
+    return { catalogCount: 0, electiveCount: 0 };
+  }
+
+  const curriculumIds = Object.keys(FLOW_CURRICULA).sort();
+  const metadataIds = Object.keys(ELECTIVE_CATALOG_META).sort();
+
+  const missingCurricula = curriculumIds.filter(
+    (courseId) => !Object.hasOwn(ELECTIVE_CATALOG_META, courseId),
+  );
+  if (missingCurricula.length > 0) {
+    report(
+      'ELECTIVE_CATALOG_META',
+      `não cobre as grades: ${missingCurricula.join(', ')}`,
+    );
+  }
+
+  const catalogKeySet = new Set(electiveCatalogKeys);
+  let catalogCount = 0;
+  let electiveCount = 0;
+
+  for (const [courseId, meta] of Object.entries(ELECTIVE_CATALOG_META)) {
+    const metaLocation = `ELECTIVE_CATALOG_META.${courseId}`;
+
+    if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+      report(metaLocation, 'metadados devem ser um objeto');
+      continue;
+    }
+
+    requireText(meta, ['minimum', 'description', 'sourceUrl'], metaLocation);
+    if (!Object.hasOwn(FLOW_CURRICULA, courseId)) {
+      requireText(meta, ['group', 'label'], metaLocation);
+      if (!['Cursos do ICE', 'Engenharias'].includes(meta.group)) {
+        report(`${metaLocation}.group`, 'grupo do curso adicional é inválido');
+      }
+    }
+    validateOfficialAcademicUrl(meta.sourceUrl, `${metaLocation}.sourceUrl`);
+    if (meta.offerUrl !== undefined) {
+      validateOfficialAcademicUrl(meta.offerUrl, `${metaLocation}.offerUrl`);
+    }
+    if (typeof meta.hasCatalog !== 'boolean') {
+      report(`${metaLocation}.hasCatalog`, 'deve ser verdadeiro ou falso');
+    }
+
+    if (!meta.hasCatalog) {
+      if (!isNonEmptyString(meta.emptyTitle)) {
+        report(`${metaLocation}.emptyTitle`, 'é obrigatório quando não há catálogo fixo');
+      }
+      if (catalogKeySet.has(courseId)) {
+        report(metaLocation, 'curso sem catálogo não deve possuir carregador de disciplinas');
+      }
+      continue;
+    }
+
+    if (!catalogKeySet.has(courseId)) {
+      report(metaLocation, 'curso com catálogo precisa possuir carregador de disciplinas');
+      continue;
+    }
+
+    catalogCount += 1;
+    let catalog;
+
+    try {
+      catalog = await loadElectiveCatalog(courseId);
+    } catch (error) {
+      report(metaLocation, `catálogo não pôde ser carregado: ${error.message}`);
+      continue;
+    }
+
+    const catalogLocation = `electiveCatalog.${courseId}`;
+    if (!catalog || typeof catalog !== 'object' || Array.isArray(catalog)) {
+      report(catalogLocation, 'catálogo deve ser um objeto');
+      continue;
+    }
+
+    validateReviewedAt(catalog.reviewedAt, `${catalogLocation}.reviewedAt`);
+    validateOfficialAcademicUrl(catalog.sourceUrl, `${catalogLocation}.sourceUrl`);
+    const disciplines = requireArray(catalog, 'disciplines', catalogLocation);
+    const disciplineCodes = [];
+
+    disciplines.forEach((discipline, disciplineIndex) => {
+      electiveCount += 1;
+      const disciplineLocation = `${catalogLocation}.disciplines[${disciplineIndex}]`;
+
+      if (!Array.isArray(discipline) || discipline.length !== 6) {
+        report(
+          disciplineLocation,
+          'eletiva deve ter [código, nome, horas, pré-requisitos, áreas, categorias]',
+        );
+        return;
+      }
+
+      const [code, title, hours, prerequisites, areas, types] = discipline;
+      if (!isNonEmptyString(code)) report(`${disciplineLocation}[0]`, 'código é obrigatório');
+      if (!isNonEmptyString(title)) report(`${disciplineLocation}[1]`, 'nome é obrigatório');
+      if (typeof hours !== 'number' || !Number.isFinite(hours) || hours <= 0) {
+        report(`${disciplineLocation}[2]`, 'carga horária deve ser um número positivo');
+      }
+      if (typeof prerequisites !== 'string') {
+        report(`${disciplineLocation}[3]`, 'pré-requisitos devem ser texto');
+      }
+
+      const areaValues = requireArray({ areas }, 'areas', disciplineLocation);
+      const typeValues = requireArray({ types }, 'types', disciplineLocation);
+      validateTextArray(areaValues, `${disciplineLocation}[4]`);
+      validateTextArray(typeValues, `${disciplineLocation}[5]`);
+      disciplineCodes.push({ value: code, location: `${disciplineLocation}[0]` });
+    });
+
+    validateUniqueValues(disciplineCodes, `código de eletiva no catálogo ${courseId}`);
+  }
+
+  for (const courseId of electiveCatalogKeys) {
+    if (!Object.hasOwn(ELECTIVE_CATALOG_META, courseId)) {
+      report(`electiveCatalogKeys.${courseId}`, 'carregador não possui metadados de curso');
+    }
+  }
+
+
+  if (metadataIds.length < curriculumIds.length) {
+    report('ELECTIVE_CATALOG_META', 'não pode conter menos cursos que FLOW_CURRICULA');
+  }
+
+  return { catalogCount, electiveCount };
+}
+
 const guideStats = validateGuides();
 const curriculumStats = validateCurricula();
+const electiveStats = await validateElectives();
 
 if (errors.length > 0) {
   console.error(`\nValidação de conteúdo falhou com ${errors.length} problema(s):`);
@@ -603,6 +760,7 @@ if (errors.length > 0) {
   console.log(
     `Conteúdo válido: ${guideStats.guideCount} guias, ${guideStats.sectionCount} seções, `
       + `${guideStats.itemCount} itens, ${guideStats.linkCount} links, `
-      + `${curriculumStats.curriculumCount} grades e ${curriculumStats.courseCount} disciplinas.`,
+      + `${curriculumStats.curriculumCount} grades, ${curriculumStats.courseCount} disciplinas, `
+      + `${electiveStats.catalogCount} catálogos e ${electiveStats.electiveCount} eletivas.`,
   );
 }

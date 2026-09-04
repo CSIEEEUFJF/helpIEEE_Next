@@ -11,6 +11,11 @@ import {
   buildCurriculumArrowEdges,
   buildCurriculumArrowPath,
 } from "../lib/curriculum-arrows.js";
+import {
+  ELECTIVE_CATALOG_META,
+  electiveCatalogKeys,
+  loadElectiveCatalog,
+} from "../lib/electives/manifest.js";
 import { shouldUseIeeeBlueHeader } from "../lib/header-tone.js";
 
 const componentSource = readFileSync(
@@ -31,6 +36,14 @@ const globalStylesSource = readFileSync(
 );
 const curriculumStylesSource = readFileSync(
   new URL("../components/CurriculumExplorer.module.css", import.meta.url),
+  "utf8",
+);
+const electivesSource = readFileSync(
+  new URL("../components/ElectivesExplorer.jsx", import.meta.url),
+  "utf8",
+);
+const electivesStylesSource = readFileSync(
+  new URL("../components/ElectivesExplorer.module.css", import.meta.url),
   "utf8",
 );
 const recoveryStylesSource = readFileSync(
@@ -270,6 +283,7 @@ function createLogicHarness({
   const factory = new Function(
     "curricula",
     "curriculumKeys",
+    "ELECTIVE_CATALOG_META",
     "window",
     `"use strict";
 ${logicPrefix}
@@ -316,7 +330,12 @@ return {
   return {
     localStorage,
     windowObject,
-    logic: factory(curriculumDefinitions, curriculumSlugs, windowObject),
+    logic: factory(
+      curriculumDefinitions,
+      curriculumSlugs,
+      ELECTIVE_CATALOG_META,
+      windowObject,
+    ),
   };
 }
 
@@ -1202,4 +1221,180 @@ test("busca da home não renormaliza todo o índice a cada tecla", () => {
   assert.match(homeSearchSource, /useDeferredValue\(query\)/);
   assert.match(homeSearchSource, /entry\.searchText\.includes\(token\)/);
   assert.doesNotMatch(homeSearchSource, /normalize\(`\$\{entry\.title\}/);
+});
+
+test("fluxo oferece uma área própria de eletivas para todos os cursos", () => {
+  assert.ok(
+    curriculumKeys.every((courseKey) => ELECTIVE_CATALOG_META[courseKey]),
+  );
+  assert.equal(Object.keys(ELECTIVE_CATALOG_META).length, 24);
+  assert.deepEqual(
+    Object.entries(ELECTIVE_CATALOG_META)
+      .filter(([courseKey]) => !curricula[courseKey])
+      .map(([courseKey]) => courseKey)
+      .sort(),
+    [
+      "engenharia-ambiental-sanitaria",
+      "engenharia-mecanica",
+      "engenharia-producao",
+    ],
+  );
+  assert.match(componentSource, /const \[viewMode, setViewMode\] = useState\("curriculum"\)/);
+  assert.match(componentSource, /activeElectiveCourseKey/);
+  assert.match(componentSource, />\s*Grade curricular\s*<\/button>/);
+  assert.match(componentSource, />\s*Eletivas\s*<\/button>/);
+  assert.match(componentSource, /import ElectivesExplorer from "\.\/ElectivesExplorer"/);
+  assert.match(componentSource, /viewMode === "curriculum" \? \(/);
+  assert.match(componentSource, /<ElectivesExplorer/);
+  assert.ok(
+    componentSource.indexOf("<RecoveryPlanner") >
+      componentSource.indexOf("<ElectivesExplorer"),
+    "o recuperador deve continuar no final da página",
+  );
+});
+
+test("catálogos de eletivas preservam estrutura, fontes e códigos únicos", async () => {
+  const expectedCatalogCounts = {
+    "ciencia-computacao-integral": 94,
+    "ciencia-computacao-noturno": 94,
+    "ciencias-exatas": 553,
+    energia: 82,
+    "engenharia-ambiental-sanitaria": 32,
+    "engenharia-civil": 108,
+    "engenharia-computacional": 93,
+    "engenharia-mecanica": 65,
+    "engenharia-producao": 14,
+    estatistica: 45,
+    "fisica-bacharelado-diurno": 21,
+    "matematica-bacharelado-diurno": 25,
+    "matematica-licenciatura-diurno": 43,
+    "quimica-licenciatura-diurno": 3,
+    "robotica-automacao": 134,
+    "sistemas-eletronicos": 59,
+    "sistemas-informacao": 84,
+    "sistemas-potencia": 175,
+    telecomunicacoes: 71,
+  };
+
+  assert.deepEqual([...electiveCatalogKeys].sort(), Object.keys(expectedCatalogCounts).sort());
+
+  for (const courseKey of electiveCatalogKeys) {
+    const catalog = await loadElectiveCatalog(courseKey);
+    const codes = catalog.disciplines.map(([code]) => code);
+
+    assert.equal(catalog.disciplines.length, expectedCatalogCounts[courseKey]);
+    assert.match(catalog.sourceUrl, /^https:\/\//);
+    assert.match(catalog.reviewedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(new Set(codes).size, codes.length);
+
+    const mandatoryCodes = new Set(
+      (curricula[courseKey]?.periods ?? [])
+        .flat()
+        .map(([code]) => code),
+    );
+    assert.deepEqual(
+      codes.filter((code) => mandatoryCodes.has(code)),
+      [],
+      `${courseKey} não deve tratar obrigatórias como eletivas`,
+    );
+
+    for (const discipline of catalog.disciplines) {
+      assert.equal(discipline.length, 6);
+      assert.equal(typeof discipline[0], "string");
+      assert.equal(typeof discipline[1], "string");
+      assert.ok(Number.isFinite(discipline[2]) && discipline[2] > 0);
+      assert.equal(typeof discipline[3], "string");
+      assert.ok(Array.isArray(discipline[4]) && discipline[4].length > 0);
+      assert.ok(Array.isArray(discipline[5]) && discipline[5].length > 0);
+    }
+  }
+});
+
+test("cursos sem catálogo fixo continuam acessíveis pela matriz oficial", () => {
+  const withoutFixedCatalog = Object.entries(ELECTIVE_CATALOG_META)
+    .filter(([, meta]) => !meta.hasCatalog)
+    .map(([courseKey]) => courseKey)
+    .sort();
+
+  assert.deepEqual(withoutFixedCatalog, [
+    "fisica-licenciatura-diurno",
+    "fisica-licenciatura-noturno",
+    "matematica-licenciatura-noturno",
+    "quimica-bacharelado-diurno",
+    "quimica-licenciatura-noturno",
+  ]);
+
+  for (const courseKey of withoutFixedCatalog) {
+    const meta = ELECTIVE_CATALOG_META[courseKey];
+    assert.equal(loadElectiveCatalog(courseKey), null);
+    assert.ok(meta.emptyTitle.length > 0);
+    assert.match(meta.sourceUrl, /^https:\/\//);
+  }
+});
+
+test("catálogos e grades preservam as categorias acadêmicas oficiais", async () => {
+  const chemistryDay = curricula["quimica-licenciatura-diurno"];
+  const chemistryNight = curricula["quimica-licenciatura-noturno"];
+  const chemistryDayCodes = chemistryDay.periods
+    .flat()
+    .map(([code]) => code);
+
+  assert.equal(
+    chemistryDay.periods.flat().reduce((total, discipline) => total + discipline[2], 0),
+    3420,
+  );
+  assert.ok(chemistryDayCodes.includes("ELETIVA-PED-P7"));
+  assert.match(chemistryNight.subtitle, /currículo 12023/);
+
+  const expectedRequiredReplacements = {
+    "engenharia-civil": ["CCI067", null],
+    "robotica-automacao": ["ENE146", "ENE086"],
+    "sistemas-potencia": ["CEL068", "ENE099"],
+  };
+
+  for (const [courseKey, [electiveCode, requiredCode]] of Object.entries(
+    expectedRequiredReplacements,
+  )) {
+    const requiredCodes = curricula[courseKey].periods
+      .flat()
+      .map(([code]) => code);
+    const catalog = await loadElectiveCatalog(courseKey);
+    const electiveCodes = catalog.disciplines.map(([code]) => code);
+
+    assert.ok(!requiredCodes.includes(electiveCode));
+    assert.ok(electiveCodes.includes(electiveCode));
+    if (requiredCode) assert.ok(requiredCodes.includes(requiredCode));
+  }
+
+  for (const courseKey of [
+    "robotica-automacao",
+    "sistemas-eletronicos",
+    "sistemas-potencia",
+    "telecomunicacoes",
+  ]) {
+    const catalog = await loadElectiveCatalog(courseKey);
+    const types = new Set(catalog.disciplines.flatMap((discipline) => discipline[5]));
+
+    assert.ok(!types.has("Optativa"), `${courseKey} usa a categoria Opcional`);
+    assert.ok(types.has("Opcional"));
+  }
+});
+
+test("explorador de eletivas posterga dados e cartões para manter fluidez", () => {
+  const cardRule = electivesStylesSource.match(/\.card\s*\{[^}]*\}/)?.[0];
+
+  assert.match(electivesSource, /useDeferredValue\(search\)/);
+  assert.match(electivesSource, /const INITIAL_VISIBLE_COUNT = 36/);
+  assert.match(electivesSource, /filteredDisciplines\.slice\(0, visibleCount\)/);
+  assert.match(electivesSource, /Mostrar mais/);
+  assert.match(
+    readFileSync(
+      new URL("../lib/electives/manifest.js", import.meta.url),
+      "utf8",
+    ),
+    /\(\) => import\("\.\/data\/ciencias-exatas\.js"\)/,
+  );
+  assert.ok(cardRule, "regra de cartão de eletiva deve existir");
+  assert.match(cardRule, /content-visibility:\s*auto/);
+  assert.match(electivesStylesSource, /@media \(max-width: 620px\)/);
 });

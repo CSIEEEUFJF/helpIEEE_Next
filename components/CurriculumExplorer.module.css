@@ -38,6 +38,71 @@
   margin-bottom: 1.5rem;
 }
 
+.flowViewSwitcher {
+  display: flex;
+  gap: 1rem 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.65rem;
+  border: 1px solid var(--flow-border);
+  border-radius: 0.55rem;
+  background: var(--flow-page);
+}
+
+.flowViewTabs {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid var(--flow-border);
+  border-radius: 0.42rem;
+  background: var(--flow-surface);
+}
+
+.flowViewTabs button {
+  min-height: 2.65rem;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--flow-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.flowViewTabs button:hover,
+.flowViewTabs button:focus-visible {
+  color: var(--flow-blue-dark);
+}
+
+.flowViewTabs button:focus-visible {
+  outline: 3px solid rgb(0 98 155 / 18%);
+  outline-offset: 0.1rem;
+}
+
+.flowViewTabs .flowViewTabActive {
+  background: var(--flow-blue);
+  color: #ffffff;
+}
+
+.flowViewTabs .flowViewTabActive:hover,
+.flowViewTabs .flowViewTabActive:focus-visible {
+  color: #ffffff;
+}
+
+.flowViewSwitcher > p {
+  margin: 0;
+  color: var(--flow-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.flowViewPanel {
+  min-width: 0;
+}
+
 .flowEyebrow,
 .flowSummaryLabel,
 .flowDetailsCode {
@@ -943,6 +1008,15 @@
   color: #121212;
 }
 
+:global(:root[data-theme="dark"]) .flowViewTabs .flowViewTabActive {
+  background: #ffffff;
+  color: #121212;
+}
+
+:global(:root[data-theme="dark"]) .flowViewTabs button:focus-visible {
+  outline-color: rgb(255 255 255 / 42%);
+}
+
 :global(:root[data-theme="dark"]) .flowCard:hover {
   border-color: #e8eaed;
   box-shadow: 0 0.5rem 1.1rem rgb(0 0 0 / 52%);
@@ -1077,6 +1151,22 @@
   .flowIntro {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .flowViewSwitcher {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .flowViewTabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .flowViewSwitcher > p {
+    padding-inline: 0.25rem;
+    text-align: left;
   }
 
   .flowToolbar,

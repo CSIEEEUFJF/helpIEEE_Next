@@ -12,9 +12,11 @@ import {
 } from "react";
 
 import { curricula, curriculumKeys } from "@/lib/curricula";
+import { ELECTIVE_CATALOG_META } from "@/lib/electives/manifest";
 
 import styles from "./CurriculumExplorer.module.css";
 import CurriculumArrows from "./CurriculumArrows";
+import ElectivesExplorer from "./ElectivesExplorer";
 import RecoveryPlanner from "./RecoveryPlanner";
 
 const STORAGE_KEY = "helpieee:curriculum-progress:v1";
@@ -219,6 +221,32 @@ const curriculumGroups = Object.freeze(
       if (leftLabel === rightLabel) return 0;
       return leftLabel < rightLabel ? -1 : 1;
     }),
+    label,
+  })).filter(({ curricula: groupCurricula }) => groupCurricula.length > 0),
+);
+const electiveCourseGroups = Object.freeze(
+  CURRICULUM_GROUP_ORDER.map((label) => ({
+    curricula: Object.keys(ELECTIVE_CATALOG_META)
+      .filter(
+        (slug) =>
+          (curricula[slug]?.group ?? ELECTIVE_CATALOG_META[slug].group) ===
+          label,
+      )
+      .sort((leftSlug, rightSlug) => {
+        const leftLabel = normalizeForSearch(
+          curricula[leftSlug]
+            ? courseLabel(curricula[leftSlug].title)
+            : ELECTIVE_CATALOG_META[leftSlug].label,
+        );
+        const rightLabel = normalizeForSearch(
+          curricula[rightSlug]
+            ? courseLabel(curricula[rightSlug].title)
+            : ELECTIVE_CATALOG_META[rightSlug].label,
+        );
+
+        if (leftLabel === rightLabel) return 0;
+        return leftLabel < rightLabel ? -1 : 1;
+      }),
     label,
   })).filter(({ curricula: groupCurricula }) => groupCurricula.length > 0),
 );
@@ -587,6 +615,9 @@ export default function CurriculumExplorer({ initialCourse }) {
   const periodsDragRef = useRef(null);
   const suppressPeriodsClickRef = useRef(false);
   const [activeCourseKey, setActiveCourseKey] = useState(initialCourseKey);
+  const [activeElectiveCourseKey, setActiveElectiveCourseKey] =
+    useState(initialCourseKey);
+  const [viewMode, setViewMode] = useState("curriculum");
   const [interactionMode, setInteractionMode] = useState("explore");
   const [showArrows, setShowArrows] = useState(true);
   const [search, setSearch] = useState("");
@@ -598,6 +629,13 @@ export default function CurriculumExplorer({ initialCourse }) {
   );
   const deferredSearch = useDeferredValue(search);
   const activeCurriculum = hydratedCurricula[activeCourseKey];
+  const selectedCourseKey =
+    viewMode === "curriculum" ? activeCourseKey : activeElectiveCourseKey;
+  const activeCourseGroups =
+    viewMode === "curriculum" ? curriculumGroups : electiveCourseGroups;
+  const selectedCourseLabel = curricula[selectedCourseKey]
+    ? courseLabel(curricula[selectedCourseKey].title)
+    : ELECTIVE_CATALOG_META[selectedCourseKey].label;
   const completedCodes = useMemo(
     () => new Set(completedByCourse[activeCourseKey] ?? []),
     [activeCourseKey, completedByCourse],
@@ -758,7 +796,13 @@ export default function CurriculumExplorer({ initialCourse }) {
   function handleCourseChange(event) {
     const nextCourseKey = event.target.value;
 
+    if (viewMode === "electives") {
+      setActiveElectiveCourseKey(nextCourseKey);
+      return;
+    }
+
     setActiveCourseKey(nextCourseKey);
+    setActiveElectiveCourseKey(nextCourseKey);
     setSearch("");
     setSelectedCode(null);
     periodsRef.current?.scrollTo({ left: 0 });
@@ -831,6 +875,10 @@ export default function CurriculumExplorer({ initialCourse }) {
     }
   }
 
+  function handleViewMode(nextMode) {
+    setViewMode(nextMode);
+  }
+
   return (
     <section
       aria-labelledby="flow-explorer-title"
@@ -840,12 +888,11 @@ export default function CurriculumExplorer({ initialCourse }) {
         <div>
           <p className={styles.flowEyebrow}>Planejamento acadêmico</p>
           <h1 className={styles.flowTitle} id="flow-explorer-title">
-            Explore sua grade curricular
+            Explore seu curso
           </h1>
           <p className={styles.flowLead}>
-            Escolha entre as graduações presenciais do ICE e as engenharias já
-            mapeadas, consulte períodos e pré-requisitos e marque o que você já
-            concluiu. Seu progresso fica salvo somente neste navegador.
+            Consulte a grade, entenda os pré-requisitos e explore as eletivas
+            das graduações presenciais do ICE e da Faculdade de Engenharia.
           </p>
         </div>
 
@@ -854,16 +901,18 @@ export default function CurriculumExplorer({ initialCourse }) {
           <select
             id={courseSelectId}
             onChange={handleCourseChange}
-            value={activeCourseKey}
+            value={selectedCourseKey}
           >
-            {curriculumGroups.map((group) => (
+            {activeCourseGroups.map((group) => (
               <optgroup
                 key={group.label}
                 label={`${group.label} (${group.curricula.length})`}
               >
                 {group.curricula.map((slug) => (
                   <option key={slug} value={slug}>
-                    {courseLabel(curricula[slug].title)}
+                    {curricula[slug]
+                      ? courseLabel(curricula[slug].title)
+                      : ELECTIVE_CATALOG_META[slug].label}
                   </option>
                 ))}
               </optgroup>
@@ -872,6 +921,44 @@ export default function CurriculumExplorer({ initialCourse }) {
         </div>
       </div>
 
+      <div className={styles.flowViewSwitcher}>
+        <div
+          aria-label="Conteúdo do curso"
+          className={styles.flowViewTabs}
+          role="group"
+        >
+          <button
+            aria-pressed={viewMode === "curriculum"}
+            className={
+              viewMode === "curriculum" ? styles.flowViewTabActive : ""
+            }
+            onClick={() => handleViewMode("curriculum")}
+            type="button"
+          >
+            Grade curricular
+          </button>
+          <button
+            aria-pressed={viewMode === "electives"}
+            className={
+              viewMode === "electives" ? styles.flowViewTabActive : ""
+            }
+            onClick={() => handleViewMode("electives")}
+            type="button"
+          >
+            Eletivas
+          </button>
+        </div>
+        <p>
+          {viewMode === "curriculum"
+            ? "Períodos, relações entre matérias e progresso."
+            : "Opções, áreas, carga horária e pré-requisitos."}
+        </p>
+      </div>
+
+      {viewMode === "curriculum" ? (
+        <div
+          className={styles.flowViewPanel}
+        >
       <div className={styles.flowSummary}>
         <div className={styles.flowSummaryHeading}>
           <div>
@@ -1232,10 +1319,25 @@ export default function CurriculumExplorer({ initialCourse }) {
         )}
       </aside>
 
-      <RecoveryPlanner
-        curriculum={activeCurriculum}
-        curriculumKey={activeCourseKey}
-      />
+        </div>
+      ) : (
+        <div
+          className={styles.flowViewPanel}
+        >
+          <ElectivesExplorer
+            courseKey={activeElectiveCourseKey}
+            courseLabel={selectedCourseLabel}
+            key={activeElectiveCourseKey}
+          />
+        </div>
+      )}
+
+      {viewMode === "curriculum" ? (
+        <RecoveryPlanner
+          curriculum={activeCurriculum}
+          curriculumKey={activeCourseKey}
+        />
+      ) : null}
     </section>
   );
 }
