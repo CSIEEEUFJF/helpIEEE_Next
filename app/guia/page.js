@@ -10,7 +10,7 @@ export const metadata = {
 export default function GuideIndexPage() {
   return (
     <>
-      <header className="page-hero">
+      <header className="page-hero" data-header-splash>
         <div className="container">
           <nav className="breadcrumb" aria-label="Navegação estrutural"><Link href="/">Início</Link><span aria-hidden="true">/</span><span>Guia</span></nav>
           <span className="eyebrow">Conhecimento para ganhar autonomia</span>

@@ -9,7 +9,7 @@ export const metadata = {
 export default function FlowPage() {
   return (
     <div className="flow-page">
-      <div className="flow-page__intro">
+      <div className="flow-page__intro" data-header-splash>
         <div className="container breadcrumb breadcrumb--dark">
           <Link href="/">Início</Link><span aria-hidden="true">/</span><span>Fluxo e eletivas</span>
         </div>

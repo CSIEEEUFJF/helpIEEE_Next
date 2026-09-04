@@ -25,12 +25,23 @@ export function HeaderToneController() {
     if (!header) return undefined;
 
     if (!splash) {
-      setHeaderTone(
-        header,
-        shouldUseIeeeBlueHeader({ hasSplash: false }),
-      );
+      function updateToneOnScroll() {
+        setHeaderTone(
+          header,
+          shouldUseIeeeBlueHeader({
+            hasSplash: false,
+            scrollY: window.scrollY,
+          }),
+        );
+      }
 
-      return () => setHeaderTone(header, false);
+      updateToneOnScroll();
+      window.addEventListener('scroll', updateToneOnScroll, { passive: true });
+
+      return () => {
+        window.removeEventListener('scroll', updateToneOnScroll);
+        setHeaderTone(header, false);
+      };
     }
 
     let observer;

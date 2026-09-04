@@ -207,7 +207,7 @@ export default function HomePage() {
           <div>
             <span className="eyebrow">Quem faz</span>
             <h2>Conhecimento compartilhado também é acolhimento.</h2>
-            <p>O HELPIEEE é uma iniciativa estudantil ligada ao Ramo IEEE UFJF. Ele organiza o que veteranos gostariam de ter encontrado quando chegaram — com linguagem direta, responsabilidade e espaço para evoluir.</p>
+            <p>O HELPIEEE é uma iniciativa estudantil ligada ao Ramo Estudantil IEEE UFJF. Ele organiza o que veteranos gostariam de ter encontrado quando chegaram — com linguagem direta, responsabilidade e espaço para evoluir.</p>
             <div className="button-row">
               <Link className="text-link" href="/guia/projeto">Conheça o projeto <span aria-hidden="true">→</span></Link>
               <a className="text-link" href="https://www.ieeeufjf.com.br/" target="_blank" rel="noreferrer">Visite o IEEE UFJF <span aria-hidden="true">↗</span></a>

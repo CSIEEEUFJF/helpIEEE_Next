@@ -1,15 +1,5 @@
 import Link from 'next/link';
 
-function formatReviewDate(value) {
-  if (!value) return null;
-  const date = new Date(`${value}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat('pt-BR', {
-    month: 'long',
-    year: 'numeric',
-  }).format(date);
-}
-
 function ResourceLink({ link }) {
   const content = <>{link.label}<span aria-hidden="true">{link.kind === 'internal' ? ' →' : ' ↗'}</span></>;
   if (link.kind === 'internal' || link.href.startsWith('/')) {
@@ -21,7 +11,7 @@ function ResourceLink({ link }) {
 export function GuideArticle({ guide, nextGuide }) {
   return (
     <>
-      <header className="page-hero">
+      <header className="page-hero" data-header-splash>
         <div className="container">
           <nav className="breadcrumb" aria-label="Navegação estrutural">
             <Link href="/">Início</Link><span aria-hidden="true">/</span>
@@ -65,13 +55,6 @@ export function GuideArticle({ guide, nextGuide }) {
                         <div className="article-links">
                           {item.links.map((link) => <ResourceLink link={link} key={`${link.href}-${link.label}`} />)}
                         </div>
-                      ) : null}
-                      {item.sourceLabel || item.reviewedAt ? (
-                        <small className="article-item__source">
-                          {item.sourceLabel ? `Fonte: ${item.sourceLabel}` : ''}
-                          {item.sourceLabel && item.reviewedAt ? ' · ' : ''}
-                          {item.reviewedAt ? `revisado em ${formatReviewDate(item.reviewedAt)}` : ''}
-                        </small>
                       ) : null}
                     </section>
                   ))}

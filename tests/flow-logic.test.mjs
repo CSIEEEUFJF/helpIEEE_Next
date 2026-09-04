@@ -58,6 +58,10 @@ const homePageSource = readFileSync(
   new URL("../app/(home)/page.js", import.meta.url),
   "utf8",
 );
+const guideIndexSource = readFileSync(
+  new URL("../app/guia/page.js", import.meta.url),
+  "utf8",
+);
 const flowPageSource = readFileSync(
   new URL("../app/fluxo/page.js", import.meta.url),
   "utf8",
@@ -942,7 +946,7 @@ test("tema escuro usa a hierarquia monocromática e alto contraste do IEEE UFJF"
   assert.match(curriculumStylesSource, /border-style:\s*dotted/);
 });
 
-test("navbar adota o azul IEEE somente depois de ultrapassar a splash", () => {
+test("navbar começa neutra e adota o azul IEEE depois da abertura", () => {
   assert.equal(
     shouldUseIeeeBlueHeader({
       hasSplash: true,
@@ -971,10 +975,21 @@ test("navbar adota o azul IEEE somente depois de ultrapassar a splash", () => {
     }),
     true,
   );
-  assert.equal(shouldUseIeeeBlueHeader({ hasSplash: false }), true);
+  assert.equal(
+    shouldUseIeeeBlueHeader({ hasSplash: false, scrollY: 0 }),
+    false,
+  );
+  assert.equal(
+    shouldUseIeeeBlueHeader({ hasSplash: false, scrollY: 1 }),
+    true,
+  );
   assert.match(homePageSource, /<section className="hero-section" data-header-splash>/);
+  assert.match(guideIndexSource, /<header className="page-hero" data-header-splash>/);
+  assert.match(guideArticleSource, /<header className="page-hero" data-header-splash>/);
+  assert.match(flowPageSource, /<div className="flow-page__intro" data-header-splash>/);
   assert.match(headerToneControllerSource, /new IntersectionObserver\(/);
   assert.match(headerToneControllerSource, /new ResizeObserver\(observeSplash\)/);
+  assert.match(headerToneControllerSource, /addEventListener\('scroll', updateToneOnScroll/);
   assert.match(headerToneControllerSource, /rootMargin: `-\$\{headerHeight\}px/);
   assert.match(globalStylesSource, /\.site-header\[data-tone="ieee-blue"\]/);
 });
