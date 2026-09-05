@@ -97,7 +97,7 @@ export default function HomePage() {
 
           <aside className="start-card" aria-label="Rota recomendada para começar">
             <div className="start-card__head">
-              <span className="eyebrow">Sua primeira semana</span>
+              <span className="eyebrow">Seus primeiros passos</span>
               <span className="status-dot">Guia rápido</span>
             </div>
             <h2>Por onde eu começo?</h2>
@@ -107,7 +107,7 @@ export default function HomePage() {
               <li><span>3</span><div><strong>Veja o seu curso</strong><small>Disciplinas e pré-requisitos.</small></div></li>
               <li><span>4</span><div><strong>Encontre sua rede</strong><small>Apoio, projetos e oportunidades.</small></div></li>
             </ol>
-            <Link href="/guia/chegada" className="text-link">Abrir roteiro da primeira semana <span aria-hidden="true">→</span></Link>
+            <Link href="/guia/chegada" className="text-link">Abrir guia de primeiros passos <span aria-hidden="true">→</span></Link>
           </aside>
         </div>
         <div className="hero-band" aria-hidden="true">

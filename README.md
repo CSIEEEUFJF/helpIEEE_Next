@@ -2,7 +2,7 @@
 
 English documentation: [`README_EN.md`](./README_EN.md)
 
-Última revisão: `2026-09-03`
+Última revisão: `2026-09-05`
 
 ## Visão geral
 
@@ -34,6 +34,7 @@ Princípios editoriais:
 O design segue a linguagem institucional do site do IEEE UFJF:
 
 - azul IEEE `#00629b` como cor principal;
+- Master Brand oficial do IEEE com troca automática entre as versões preta e branca conforme o fundo do cabeçalho;
 - superfícies claras, hierarquia editorial e alto contraste;
 - tipografia Open Sans carregada por `next/font`;
 - cabeçalho e rodapé institucionais compartilhados;
@@ -41,7 +42,7 @@ O design segue a linguagem institucional do site do IEEE UFJF:
 - tema claro/escuro com preferência salva localmente;
 - estados de foco visíveis e estrutura semântica de navegação.
 
-Os tokens e estilos globais ficam em [`app/globals.css`](./app/globals.css). O shell compartilhado é definido em [`app/layout.js`](./app/layout.js).
+Os tokens e estilos globais ficam em [`app/globals.css`](./app/globals.css). O shell compartilhado é definido em [`app/layout.js`](./app/layout.js). As regras de uso da marca, paleta, tipografia, arquivos oficiais e checklist de publicação estão em [`BRAND.md`](./BRAND.md).
 
 ## Rotas
 
@@ -98,17 +99,17 @@ Cada guia possui título, resumo, público, escopo, palavras-chave, `reviewedAt`
 
 ### Fluxos curriculares
 
-[`lib/curricula.js`](./lib/curricula.js) centraliza períodos, disciplinas, cargas/créditos e pré-requisitos. Há dez grades cadastradas:
+[`lib/curricula.js`](./lib/curricula.js) centraliza períodos, disciplinas, cargas/créditos e pré-requisitos. Há 21 grades cadastradas, cobrindo:
 
-- Engenharia Elétrica — Sistemas Eletrônicos;
-- Engenharia Elétrica — Sistemas de Potência;
-- Engenharia Elétrica — Robótica e Automação Industrial;
-- Engenharia Elétrica — Energia;
-- Engenharia Elétrica — Telecomunicações;
-- Engenharia Computacional;
-- Engenharia Civil;
+- as habilitações de Engenharia Elétrica;
+- Engenharia Computacional e Engenharia Civil;
 - Ciência da Computação — integral e noturno;
-- Sistemas de Informação.
+- Sistemas de Informação;
+- Bacharelado em Ciências Exatas;
+- Química — bacharelado e licenciaturas integral e noturna;
+- Estatística;
+- Física — bacharelado e licenciaturas integral e noturna;
+- Matemática — bacharelado e licenciaturas integral e noturna.
 
 O explorador permite selecionar a grade, pesquisar por nome ou código, consultar pré-requisitos e disciplinas desbloqueadas, marcar conclusões e acompanhar progresso. O progresso fica somente no navegador, em `localStorage`.
 
@@ -136,7 +137,7 @@ Defina `NEXT_PUBLIC_SITE_URL` com a origem canônica do ambiente antes do build.
 
 ## Imagem social
 
-[`public/og.png`](./public/og.png) é a imagem Open Graph/Twitter do projeto (`1735 × 906`). Ela é declarada nos metadados de [`app/layout.js`](./app/layout.js), que resolve a URL absoluta a partir de `NEXT_PUBLIC_SITE_URL`. Sempre que nome, posicionamento, domínio ou identidade visual mudarem, revise a imagem e o texto alternativo juntos.
+[`public/og.png`](./public/og.png) é a imagem Open Graph/Twitter do projeto (`1200 × 630`) e usa o Master Brand oficial. Ela é declarada nos metadados de [`app/layout.js`](./app/layout.js), que resolve a URL absoluta a partir de `NEXT_PUBLIC_SITE_URL`. Sempre que nome, posicionamento, domínio ou identidade visual mudarem, revise a imagem e o texto alternativo juntos.
 
 ## Desenvolvimento
 
@@ -176,7 +177,7 @@ Antes de entregar uma alteração:
 7. teste tema, menu, busca, links externos e persistência do fluxo;
 8. confirme que os aliases antigos redirecionam corretamente.
 
-Na revisão de `2026-09-03`, `npm run validate:content`, `npm run lint` e `npm run build` concluíram sem erros. O validador conferiu 6 guias, 21 seções, 83 itens, 67 links, 10 grades e 544 disciplinas; as 29 páginas processadas pelo build foram geradas com sucesso.
+Na revisão de `2026-09-05`, `npm run validate:content`, `npm run lint`, `npm run test:flow` e `npm run build` concluíram sem erros. O validador conferiu 6 guias, 21 grades curriculares e 19 catálogos de eletivas; as 29 páginas processadas pelo build foram geradas com sucesso.
 
 ## Atualização de conteúdo
 
@@ -193,6 +194,7 @@ Não copie informações de grupos informais como se fossem oficiais. Materiais 
 ## Arquivos para retomada
 
 - [`CURRENT_STATE.md`](./CURRENT_STATE.md)
+- [`BRAND.md`](./BRAND.md)
 - [`app/layout.js`](./app/layout.js)
 - [home](<./app/(home)/page.js>)
 - [índice do guia](./app/guia/page.js)

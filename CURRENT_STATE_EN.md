@@ -1,6 +1,6 @@
 # Current state — HELPIEEE Next
 
-Last updated: `2026-09-03`
+Last updated: `2026-09-05`
 
 ## Summary
 
@@ -8,13 +8,15 @@ HELPIEEE has been rebuilt as a React/Next.js guide for first-year **Exact Scienc
 
 ## Delivered
 
-- a visual identity aligned with the IEEE UFJF website, using institutional blue `#00629b`, Open Sans, light surfaces, and a dark theme;
+- a visual identity aligned with IEEE Brand Experience, using the institutional palette, Open Sans, a dynamic official Master Brand, official favicon, and social image;
 - a shared, responsive, accessible shell with header, footer, and mobile menu;
 - a home page with local search, explicit audience, and track entry points;
 - the `/guia` index and six static `/guia/[slug]` pages;
-- the `/fluxo` curriculum explorer with ten curricula, search, prerequisites, unlocks, and local progress;
+- the `/fluxo` curriculum explorer with 21 curricula, side-by-side periods, drag scrolling, dependency arrows, search, prerequisites, unlocks, and local progress;
+- an elective explorer with 19 catalogs and official-matrix fallbacks;
+- a recovery simulator at the end of the flow page;
 - preserved old `.html` aliases through redirects, with no legacy HTML dependency;
-- an Open Graph/Twitter image at [`public/og.png`](./public/og.png);
+- a `1200 × 630` Open Graph/Twitter image at [`public/og.png`](./public/og.png);
 - global metadata for the “Exact Sciences and Engineering guide at UFJF” positioning and a `metadataBase` configurable through `NEXT_PUBLIC_SITE_URL`;
 - Next.js `16.3.4` with React/React DOM `19.2.8`;
 - a Vinext/Vite Sites deployment layer with Cloudflare Worker-compatible output.
@@ -36,7 +38,9 @@ HELPIEEE has been rebuilt as a React/Next.js guide for first-year **Exact Scienc
 ## Sources of truth
 
 - [`lib/guides.js`](./lib/guides.js): six guides, official links, `reviewedAt`, `sourceLabel`, editorial notes, and alias mapping;
-- [`lib/curricula.js`](./lib/curricula.js): ten curricula with periods, courses, workloads/credits, and prerequisites;
+- [`lib/curricula.js`](./lib/curricula.js): 21 curricula with periods, courses, workloads/credits, and prerequisites;
+- [`lib/electives`](./lib/electives): 19 elective catalogs and official sources;
+- [`BRAND.md`](./BRAND.md): brand, palette, typography, official asset, and release rules;
 - [`app/globals.css`](./app/globals.css): tokens and visual system;
 - [`components/GuideArticle.jsx`](./components/GuideArticle.jsx): editorial renderer;
 - [`components/CurriculumExplorer.jsx`](./components/CurriculumExplorer.jsx): explorer and progress persistence;
@@ -55,10 +59,12 @@ See [`README_EN.md`](./README_EN.md) for the full process.
 
 ## Latest validation
 
-Completed successfully on `2026-09-03`:
+Completed successfully on `2026-09-05`:
 
-- `npm run validate:content` — 6 guides, 21 sections, 83 items, 67 links, 10 curricula, and 544 courses
+- `npm run validate:content` — 6 guides, 20 sections, 81 items, 67 links, 21 curricula, 1,140 courses, 19 catalogs, and 1,795 electives
+- `npm run validate:links` — 46 of 46 links valid
 - `npm run lint`
+- `npm run test:flow` — 41 passing tests
 - `npm run build`
 - all 29 pages processed by the production build
 

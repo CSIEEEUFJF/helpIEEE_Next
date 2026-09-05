@@ -1,6 +1,6 @@
 # Estado atual — HELPIEEE Next
 
-Última atualização: `2026-09-03`
+Última atualização: `2026-09-05`
 
 ## Resumo
 
@@ -8,13 +8,15 @@ O HELPIEEE foi reconstruído como um guia React/Next.js para calouros de **Ciên
 
 ## Entregue
 
-- identidade visual alinhada ao site do IEEE UFJF, com azul institucional `#00629b`, Open Sans, superfícies claras e tema escuro;
+- identidade visual alinhada ao IEEE Brand Experience, com paleta institucional, Open Sans, Master Brand oficial dinâmico, favicon e imagem social próprios;
 - shell compartilhado, responsivo e acessível, com cabeçalho, rodapé e menu móvel;
 - home com busca local, público explícito e acesso às trilhas;
 - índice `/guia` e seis páginas estáticas em `/guia/[slug]`;
-- fluxo curricular em `/fluxo`, com dez grades, pesquisa, pré-requisitos, desbloqueios e progresso local;
+- fluxo curricular em `/fluxo`, com 21 grades, todos os períodos lado a lado, arraste horizontal, setas de dependência, pesquisa, pré-requisitos, desbloqueios e progresso local;
+- explorador de eletivas com 19 catálogos e acesso à matriz oficial quando não existe catálogo fixo;
+- simulador de recuperação ao final do fluxo;
 - aliases `.html` antigos preservados por redirecionamento, sem dependência de HTML legado;
-- imagem Open Graph/Twitter em [`public/og.png`](./public/og.png);
+- imagem Open Graph/Twitter de `1200 × 630` em [`public/og.png`](./public/og.png);
 - metadados globais para o posicionamento “Guia de Exatas e Engenharias da UFJF” e `metadataBase` configurável por `NEXT_PUBLIC_SITE_URL`;
 - Next.js `16.3.4` com React/React DOM `19.2.8`;
 - camada de deploy para Sites via Vinext/Vite, com build compatível com Cloudflare Workers.
@@ -36,7 +38,9 @@ O HELPIEEE foi reconstruído como um guia React/Next.js para calouros de **Ciên
 ## Fontes de verdade
 
 - [`lib/guides.js`](./lib/guides.js): seis guias, links oficiais, `reviewedAt`, `sourceLabel`, notas editoriais e mapa de aliases;
-- [`lib/curricula.js`](./lib/curricula.js): dez grades com períodos, disciplinas, cargas/créditos e pré-requisitos;
+- [`lib/curricula.js`](./lib/curricula.js): 21 grades com períodos, disciplinas, cargas/créditos e pré-requisitos;
+- [`lib/electives`](./lib/electives): 19 catálogos de eletivas e suas fontes oficiais;
+- [`BRAND.md`](./BRAND.md): regras de marca, paleta, tipografia, arquivos oficiais e checklist;
 - [`app/globals.css`](./app/globals.css): tokens e sistema visual;
 - [`components/GuideArticle.jsx`](./components/GuideArticle.jsx): renderer editorial;
 - [`components/CurriculumExplorer.jsx`](./components/CurriculumExplorer.jsx): explorador e persistência de progresso;
@@ -55,10 +59,12 @@ O processo detalhado está em [`README.md`](./README.md).
 
 ## Validação mais recente
 
-Executado com sucesso em `2026-09-03`:
+Executado com sucesso em `2026-09-05`:
 
-- `npm run validate:content` — 6 guias, 21 seções, 83 itens, 67 links, 10 grades e 544 disciplinas
+- `npm run validate:content` — 6 guias, 20 seções, 81 itens, 67 links, 21 grades, 1.140 disciplinas, 19 catálogos e 1.795 eletivas
+- `npm run validate:links` — 46 de 46 links válidos
 - `npm run lint`
+- `npm run test:flow` — 41 testes aprovados
 - `npm run build`
 - compilação das 29 páginas processadas pelo build
 

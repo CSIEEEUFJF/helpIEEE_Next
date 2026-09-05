@@ -94,6 +94,14 @@ const siteFooterSource = readFileSync(
   new URL("../components/SiteFooter.jsx", import.meta.url),
   "utf8",
 );
+const siteHeaderSource = readFileSync(
+  new URL("../components/SiteHeader.jsx", import.meta.url),
+  "utf8",
+);
+const ieeeMasterBrandSource = readFileSync(
+  new URL("../components/IeeeMasterBrand.jsx", import.meta.url),
+  "utf8",
+);
 const guideArticleSource = readFileSync(
   new URL("../components/GuideArticle.jsx", import.meta.url),
   "utf8",
@@ -1026,25 +1034,31 @@ test("interface não volta a exibir disclaimers editoriais ou estáticos", () =>
     guidesSource,
   ];
   const forbiddenCopy =
-    /Transparência editorial|Conteúdo revisado|Use como apoio ao planejamento|esta é apenas uma simulação|Compromissos editoriais|O guia não substitui/;
+    /Transparência editorial|Conteúdo revisado|Use como apoio ao planejamento|esta é apenas uma simulação|Compromissos editoriais|O guia não substitui|página legada|acervo legado|projeto legado|material legado/i;
 
   for (const source of interfaceSources) {
     assert.doesNotMatch(source, forbiddenCopy);
   }
 
   assert.doesNotMatch(guideArticleSource, /guide\.scope/);
-  assert.match(guideArticleSource, /className="article-audience"/);
+  assert.doesNotMatch(guideArticleSource, /guide\.audience|article-audience/);
   assert.doesNotMatch(
     globalStylesSource,
-    /\.(?:trust-note|site-footer__editorial|flow-disclaimer|article-trust|article-scope)\b/,
+    /\.(?:trust-note|site-footer__editorial|flow-disclaimer|article-trust|article-scope|article-audience)\b/,
   );
   assert.doesNotMatch(recoveryStylesSource, /\.disclaimer\b/);
   assert.match(aboutPageSource, /redirect\('\/guia\/projeto'\)/);
 });
 
-test("marca de origem usa um círculo perfeito", () => {
+test("marca de origem não usa recipiente em nenhum dos temas", () => {
   const originMarkRule = globalStylesSource.match(
     /\.origin-mark\s*\{[^}]*\}/,
+  )?.[0];
+  const originMarkImageRule = globalStylesSource.match(
+    /\.origin-mark img\s*\{[^}]*\}/,
+  )?.[0];
+  const lightOriginMarkRule = globalStylesSource.match(
+    /:root:not\(\[data-theme="dark"\]\) \.origin-mark\s*\{[^}]*\}/,
   )?.[0];
   const darkOriginMarkRule = globalStylesSource.match(
     /:root\[data-theme="dark"\] \.origin-mark\s*\{[^}]*\}/,
@@ -1053,10 +1067,40 @@ test("marca de origem usa um círculo perfeito", () => {
   assert.ok(originMarkRule, "regra da marca de origem deve existir");
   assert.match(originMarkRule, /aspect-ratio:\s*1/);
   assert.match(originMarkRule, /border-radius:\s*50%/);
-  assert.doesNotMatch(originMarkRule, /border-radius:[^;]*15%/);
   assert.doesNotMatch(originMarkRule, /box-shadow/);
+  assert.ok(originMarkImageRule, "regra da imagem da marca deve existir");
+  assert.match(originMarkImageRule, /width:\s*100%/);
+  assert.match(originMarkImageRule, /height:\s*100%/);
+  assert.ok(lightOriginMarkRule, "regra clara da marca de origem deve existir");
+  assert.match(lightOriginMarkRule, /border-radius:\s*0/);
+  assert.match(lightOriginMarkRule, /mask:[^;]*ieee-ufjf\.svg/);
+  assert.match(lightOriginMarkRule, /box-shadow:\s*none/);
   assert.ok(darkOriginMarkRule, "regra escura da marca de origem deve existir");
-  assert.doesNotMatch(darkOriginMarkRule, /box-shadow/);
+  assert.match(darkOriginMarkRule, /border-radius:\s*0/);
+  assert.match(darkOriginMarkRule, /background:\s*transparent/);
+  assert.match(darkOriginMarkRule, /box-shadow:\s*none/);
+});
+
+test("cabeçalho e metadados preservam a identidade oficial IEEE", () => {
+  assert.match(siteHeaderSource, /<IeeeMasterBrand\s*\/>/);
+  assert.match(ieeeMasterBrandSource, /href="https:\/\/www\.ieee\.org\/"/);
+  assert.match(ieeeMasterBrandSource, /alt="IEEE"/);
+  assert.match(ieeeMasterBrandSource, /ieee-master-brand-black\.png/);
+  assert.match(ieeeMasterBrandSource, /ieee-master-brand-white\.png/);
+  assert.match(ieeeMasterBrandSource, /attributeFilter:\s*\['data-tone'\]/);
+  assert.match(ieeeMasterBrandSource, /attributeFilter:\s*\['data-theme'\]/);
+  assert.match(globalStylesSource, /\.site-header__ieee-master-brand\s*\{[^}]*width:\s*113px/s);
+  assert.doesNotMatch(globalStylesSource, /font-weight:\s*900/);
+  assert.match(rootLayoutSource, /ieee-favicon-32x32\.png/);
+  assert.match(rootLayoutSource, /width:\s*1200/);
+  assert.match(rootLayoutSource, /height:\s*630/);
+  assert.match(siteFooterSource, /ieee-master-brand-white\.png/);
+  assert.match(siteFooterSource, /href="https:\/\/www\.ieee\.org\/"/);
+  assert.match(siteFooterSource, />\s*Ramo Estudantil IEEE UFJF\s*</);
+  assert.match(
+    siteFooterSource,
+    /Um projeto desenvolvido pela IEEE Computer Society e IEEE Education\s+Society do Ramo Estudantil IEEE UFJF\./,
+  );
 });
 
 test("grade permite arrastar horizontalmente sem acionar cartões", () => {

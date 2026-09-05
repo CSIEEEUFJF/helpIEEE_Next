@@ -21,11 +21,6 @@ export function GuideArticle({ guide, nextGuide }) {
           <span className="eyebrow">{guide.eyebrow}</span>
           <h1>{guide.title}</h1>
           <p>{guide.summary}</p>
-          {guide.audience ? (
-            <div className="article-audience">
-              <span>{guide.audience}</span>
-            </div>
-          ) : null}
         </div>
       </header>
 

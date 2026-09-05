@@ -1,28 +1,28 @@
 .flowExplorer {
   --flow-blue: var(--ieee-blue, #00629b);
-  --flow-blue-dark: var(--ieee-blue-strong, #004f7d);
-  --flow-blue-soft: var(--surface-blue, #eaf5fb);
-  --flow-ink: var(--ink, #17212b);
-  --flow-muted: var(--muted, #536575);
-  --flow-border: var(--line, #d8e2e8);
+  --flow-blue-dark: var(--ieee-blue-strong, #002855);
+  --flow-blue-soft: var(--surface-blue, #e6eff5);
+  --flow-ink: var(--ink, #002855);
+  --flow-muted: var(--muted, #405e80);
+  --flow-border: var(--line, #ddddde);
   --flow-surface: var(--surface, #ffffff);
-  --flow-page: var(--surface-soft, #f5f8fa);
-  --flow-prerequisite: #c66b00;
+  --flow-page: var(--surface-soft, #f2f3f3);
+  --flow-prerequisite: #e87722;
   --flow-prerequisite-background: color-mix(
     in srgb,
-    var(--flow-prerequisite) 9%,
+    var(--flow-prerequisite) 10%,
     var(--flow-surface)
   );
-  --flow-unlock: #268262;
+  --flow-unlock: #006341;
   --flow-unlock-background: color-mix(
     in srgb,
-    var(--flow-unlock) 9%,
+    var(--flow-unlock) 10%,
     var(--flow-surface)
   );
-  --flow-corequisite: #7052a3;
+  --flow-corequisite: #772583;
   --flow-corequisite-background: color-mix(
     in srgb,
-    var(--flow-corequisite) 9%,
+    var(--flow-corequisite) 10%,
     var(--flow-surface)
   );
   width: min(100%, 96rem);
@@ -183,7 +183,7 @@
   border-left: 0.3rem solid var(--flow-blue);
   border-radius: 0.5rem;
   background: var(--flow-surface);
-  box-shadow: 0 0.4rem 1.4rem rgb(25 59 79 / 6%);
+  box-shadow: 0 0.4rem 1.4rem rgb(0 40 85 / 6%);
 }
 
 .flowSummaryHeading {
@@ -212,13 +212,13 @@
   overflow: hidden;
   border: 0;
   border-radius: 999px;
-  background: #e4ebef;
+  background: color-mix(in srgb, var(--flow-blue-dark) 10%, var(--flow-surface));
   color: var(--flow-blue);
 }
 
 .flowProgress::-webkit-progress-bar {
   border-radius: 999px;
-  background: #e4ebef;
+  background: color-mix(in srgb, var(--flow-blue-dark) 10%, var(--flow-surface));
 }
 
 .flowProgress::-webkit-progress-value {
@@ -457,8 +457,8 @@
 }
 
 .flowLegend .flowLegendCompleted {
-  border-color: #71a38f;
-  background: #e6f3ed;
+  border-color: color-mix(in srgb, #006341 50%, var(--flow-surface));
+  background: color-mix(in srgb, #006341 10%, var(--flow-surface));
 }
 
 .flowHorizontalHint {
@@ -651,14 +651,14 @@
   border: 1px solid var(--flow-border);
   border-radius: 0.45rem;
   background: var(--flow-surface);
-  box-shadow: 0 0.2rem 0.7rem rgb(25 59 79 / 4%);
+  box-shadow: 0 0.2rem 0.7rem rgb(0 40 85 / 4%);
   transition:
     border-color 160ms ease,
     background-color 160ms ease;
 }
 
 .flowCardCompleted {
-  border-color: #91b9aa;
+  border-color: color-mix(in srgb, #006341 50%, var(--flow-surface));
 }
 
 .flowCardAvailable:not(.flowCardCompleted) {
@@ -668,19 +668,19 @@
 .flowCard.flowCardPrerequisite {
   border-color: var(--flow-prerequisite);
   background: var(--flow-prerequisite-background);
-  box-shadow: 0 0 0 2px rgb(198 107 0 / 12%);
+  box-shadow: 0 0 0 2px rgb(232 119 34 / 12%);
 }
 
 .flowCard.flowCardUnlock {
   border-color: var(--flow-unlock);
   background: var(--flow-unlock-background);
-  box-shadow: 0 0 0 2px rgb(38 130 98 / 12%);
+  box-shadow: 0 0 0 2px rgb(0 99 65 / 12%);
 }
 
 .flowCard.flowCardCorequisite {
   border-color: var(--flow-corequisite);
   background: var(--flow-corequisite-background);
-  box-shadow: 0 0 0 2px rgb(112 82 163 / 12%);
+  box-shadow: 0 0 0 2px rgb(119 37 131 / 12%);
 }
 
 .flowCard.flowCardSelected {
@@ -740,8 +740,8 @@
 }
 
 .flowStatusCompleted {
-  background: #e6f3ed;
-  color: #27684f;
+  background: color-mix(in srgb, #006341 10%, var(--flow-surface));
+  color: #006341;
 }
 
 .flowStatusAvailable {
@@ -755,8 +755,8 @@
 }
 
 .flowStatusBlocked {
-  background: #eef1f3;
-  color: #687681;
+  background: color-mix(in srgb, #75787b 10%, var(--flow-surface));
+  color: var(--flow-muted);
 }
 
 .flowRelationBadge {
@@ -766,7 +766,7 @@
 }
 
 .flowRelationBadgePrerequisite {
-  color: color-mix(in srgb, var(--flow-prerequisite) 82%, var(--flow-ink));
+  color: var(--flow-ink);
 }
 
 .flowRelationBadgeUnlock {
@@ -809,7 +809,7 @@
   border-top: 0.3rem solid var(--flow-blue);
   border-radius: 0.55rem;
   background: var(--flow-surface);
-  box-shadow: 0 0.7rem 2rem rgb(25 59 79 / 8%);
+  box-shadow: 0 0.7rem 2rem rgb(0 40 85 / 8%);
 }
 
 .flowDetailsHeader {
@@ -1261,8 +1261,8 @@
   }
 
   .flowCard:hover {
-    border-color: #9dbbc9;
-    box-shadow: 0 0.45rem 1rem rgb(25 59 79 / 9%);
+    border-color: color-mix(in srgb, var(--flow-blue) 50%, var(--flow-surface));
+    box-shadow: 0 0.45rem 1rem rgb(0 40 85 / 9%);
     transform: translateY(-1px);
   }
 

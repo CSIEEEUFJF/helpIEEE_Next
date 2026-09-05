@@ -1,12 +1,12 @@
 .planner {
   --planner-blue: var(--ieee-blue, #00629b);
-  --planner-blue-dark: var(--ieee-blue-strong, #004f7d);
-  --planner-blue-soft: var(--surface-blue, #eaf5fb);
-  --planner-ink: var(--ink, #17212b);
-  --planner-muted: var(--muted, #536575);
-  --planner-border: var(--line, #d8e2e8);
+  --planner-blue-dark: var(--ieee-blue-strong, #002855);
+  --planner-blue-soft: var(--surface-blue, #e6eff5);
+  --planner-ink: var(--ink, #002855);
+  --planner-muted: var(--muted, #405e80);
+  --planner-border: var(--line, #ddddde);
   --planner-surface: var(--surface, #fff);
-  --planner-page: var(--surface-soft, #f7fafb);
+  --planner-page: var(--surface-soft, #f2f3f3);
   width: min(100%, 96rem);
   content-visibility: auto;
   contain-intrinsic-block-size: auto 34rem;
@@ -17,7 +17,7 @@
   border-radius: 0.65rem;
   background: var(--planner-surface);
   color: var(--planner-ink);
-  box-shadow: 0 0.65rem 2rem rgb(25 59 79 / 7%);
+  box-shadow: 0 0.65rem 2rem rgb(0 40 85 / 7%);
 }
 
 .header {
@@ -316,9 +316,9 @@
 .warning {
   margin-top: 1rem;
   padding: 0.9rem 1rem;
-  border: 1px solid color-mix(in srgb, #d28a17 55%, var(--planner-border));
+  border: 1px solid color-mix(in srgb, #e87722 55%, var(--planner-border));
   border-radius: 0.45rem;
-  background: color-mix(in srgb, #d28a17 10%, var(--planner-surface));
+  background: color-mix(in srgb, #e87722 10%, var(--planner-surface));
   color: var(--planner-ink);
   font-size: 0.82rem;
   line-height: 1.5;

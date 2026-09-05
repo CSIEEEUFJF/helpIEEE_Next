@@ -21,7 +21,12 @@ export const metadata = {
   description:
     'Um guia feito por estudantes para ajudar calouros de Exatas e Engenharias da UFJF a entender a universidade, organizar os estudos e encontrar oportunidades.',
   icons: {
-    icon: '/assets/images/branding/helpieee-favicon.png',
+    icon: {
+      url: '/assets/images/branding/ieee-favicon-32x32.png',
+      type: 'image/png',
+      sizes: '32x32',
+    },
+    apple: '/assets/images/branding/ieee-apple-touch-icon.png',
   },
   openGraph: {
     type: 'website',
@@ -32,8 +37,9 @@ export const metadata = {
     images: [
       {
         url: '/og.png',
-        width: 1735,
-        height: 906,
+        width: 1200,
+        height: 630,
+        type: 'image/png',
         alt: 'HELPIEEE — Comece a UFJF com direção.',
       },
     ],

@@ -297,7 +297,7 @@ function selectDisciplineGroups(
 }
 
 /**
- * Monta a mesma simulação do HELPIEEE legado em uma função pura.
+ * Monta a simulação de recuperação do HELPIEEE em uma função pura.
  *
  * `curriculum` aceita tanto a definição bruta de `lib/curricula.js` quanto o
  * objeto hidratado usado por `CurriculumExplorer`. Retorna `null` quando a

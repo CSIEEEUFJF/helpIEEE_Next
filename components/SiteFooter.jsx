@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { SITE_NAVIGATION } from '@/components/siteNavigation';
 
@@ -33,10 +34,24 @@ export function SiteFooter() {
         </nav>
 
         <section className="site-footer__ieee" aria-labelledby="footer-ieee-title">
-          <h2 className="site-footer__title" id="footer-ieee-title">IEEE UFJF</h2>
+          <a
+            className="site-footer__ieee-master-brand"
+            href="https://www.ieee.org/"
+            aria-label="IEEE"
+          >
+            <Image
+              src="/assets/images/branding/ieee-master-brand-white.png"
+              alt="IEEE"
+              width={113}
+              height={33}
+            />
+          </a>
+          <h2 className="site-footer__title" id="footer-ieee-title">
+            Ramo Estudantil IEEE UFJF
+          </h2>
           <p>
-            O HELPIEEE é uma iniciativa do Ramo Estudantil IEEE da Universidade
-            Federal de Juiz de Fora.
+            Um projeto desenvolvido pela IEEE Computer Society e IEEE Education
+            Society do Ramo Estudantil IEEE UFJF.
           </p>
           <a
             className="site-footer__text-link"

@@ -2,7 +2,7 @@
 
 Portuguese documentation: [`README.md`](./README.md)
 
-Last reviewed: `2026-09-03`
+Last reviewed: `2026-09-05`
 
 ## Overview
 
@@ -34,6 +34,7 @@ Editorial principles:
 The design follows the institutional language of the IEEE UFJF website:
 
 - IEEE blue `#00629b` as the primary color;
+- official IEEE Master Brand with automatic black/white switching based on the header background;
 - light surfaces, editorial hierarchy, and strong contrast;
 - Open Sans loaded through `next/font`;
 - shared institutional header and footer;
@@ -41,7 +42,7 @@ The design follows the institutional language of the IEEE UFJF website:
 - light/dark theme with a locally stored preference;
 - visible focus states and semantic navigation structure.
 
-Global tokens and styles live in [`app/globals.css`](./app/globals.css). The shared shell is defined in [`app/layout.js`](./app/layout.js).
+Global tokens and styles live in [`app/globals.css`](./app/globals.css). The shared shell is defined in [`app/layout.js`](./app/layout.js). Brand usage, palette, typography, official files, and the release checklist are documented in [`BRAND.md`](./BRAND.md).
 
 ## Routes
 
@@ -98,17 +99,15 @@ Each guide includes a title, summary, audience, scope, keywords, `reviewedAt`, `
 
 ### Curriculum flows
 
-[`lib/curricula.js`](./lib/curricula.js) centralizes periods, courses, workload/credits, and prerequisites. Ten curricula are registered:
+[`lib/curricula.js`](./lib/curricula.js) centralizes periods, courses, workload/credits, and prerequisites. The 21 registered curricula cover:
 
-- Electrical Engineering — Electronic Systems;
-- Electrical Engineering — Power Systems;
-- Electrical Engineering — Robotics and Industrial Automation;
-- Electrical Engineering — Energy;
-- Electrical Engineering — Telecommunications;
-- Computational Engineering;
-- Civil Engineering;
+- the Electrical Engineering tracks;
+- Computational Engineering and Civil Engineering;
 - Computer Science — full-time and evening;
-- Information Systems.
+- Information Systems;
+- the Exact Sciences bachelor's program;
+- Chemistry, Physics, and Mathematics bachelor's and teaching degrees;
+- Statistics.
 
 The explorer supports curriculum selection, search by name or code, prerequisite and unlock inspection, completion tracking, and progress summaries. Progress remains in the browser through `localStorage`.
 
@@ -136,7 +135,7 @@ Set `NEXT_PUBLIC_SITE_URL` to the environment's canonical origin before building
 
 ## Social image
 
-[`public/og.png`](./public/og.png) is the project's Open Graph/Twitter image (`1735 × 906`). It is declared in [`app/layout.js`](./app/layout.js), which resolves its absolute URL from `NEXT_PUBLIC_SITE_URL`. Whenever the name, positioning, domain, or visual identity changes, review the image and its alternative text together.
+[`public/og.png`](./public/og.png) is the project's `1200 × 630` Open Graph/Twitter image and uses the official Master Brand. It is declared in [`app/layout.js`](./app/layout.js), which resolves its absolute URL from `NEXT_PUBLIC_SITE_URL`. Whenever the name, positioning, domain, or visual identity changes, review the image and its alternative text together.
 
 ## Development
 
@@ -176,7 +175,7 @@ Before delivering a change:
 7. test theme, menu, search, external links, and flow persistence;
 8. confirm that old aliases redirect correctly.
 
-In the `2026-09-03` review, `npm run validate:content`, `npm run lint`, and `npm run build` completed without errors. The validator checked 6 guides, 21 sections, 83 items, 67 links, 10 curricula, and 544 courses; all 29 pages processed by the build were generated successfully.
+In the `2026-09-05` review, `npm run validate:content`, `npm run validate:links`, `npm run lint`, `npm run test:flow`, and `npm run build` completed without errors. The validator checked 6 guides, 21 curricula, and 19 elective catalogs; all 29 pages processed by the build were generated successfully.
 
 ## Updating content
 
@@ -193,6 +192,7 @@ Do not copy information from informal groups as if it were official. Older mater
 ## Key files for resuming work
 
 - [`CURRENT_STATE_EN.md`](./CURRENT_STATE_EN.md)
+- [`BRAND.md`](./BRAND.md)
 - [`app/layout.js`](./app/layout.js)
 - [home](<./app/(home)/page.js>)
 - [guide index](./app/guia/page.js)

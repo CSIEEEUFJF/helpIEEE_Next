@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { HeaderToneController } from '@/components/HeaderToneController';
+import { IeeeMasterBrand } from '@/components/IeeeMasterBrand';
 import { MobileNavigation } from '@/components/MobileNavigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { PRIMARY_CTA, SITE_NAVIGATION } from '@/components/siteNavigation';
@@ -56,6 +57,7 @@ export function SiteHeader() {
                 {PRIMARY_CTA.label}
               </Link>
               <MobileNavigation />
+              <IeeeMasterBrand />
             </div>
           </div>
         </div>
