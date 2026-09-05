@@ -8,7 +8,7 @@ HELPIEEE has been rebuilt as a React/Next.js guide for first-year **Exact Scienc
 
 ## Delivered
 
-- a visual identity aligned with IEEE Brand Experience, using the institutional palette, Open Sans, a dynamic official Master Brand, official favicon, and social image;
+- a visual identity aligned with IEEE Brand Experience, using the institutional palette, Open Sans, a dynamic official Master Brand, HELPIEEE favicon, and social image;
 - a shared, responsive, accessible shell with header, footer, and mobile menu;
 - a home page with local search, explicit audience, and track entry points;
 - the `/guia` index and six static `/guia/[slug]` pages;
@@ -61,8 +61,8 @@ See [`README_EN.md`](./README_EN.md) for the full process.
 
 Completed successfully on `2026-09-05`:
 
-- `npm run validate:content` — 6 guides, 20 sections, 81 items, 67 links, 21 curricula, 1,140 courses, 19 catalogs, and 1,795 electives
-- `npm run validate:links` — 46 of 46 links valid
+- `npm run validate:content` — 6 guides, 20 sections, 80 items, 66 links, 21 curricula, 1,140 courses, 19 catalogs, and 1,795 electives
+- `npm run validate:links` — 45 of 45 links valid
 - `npm run lint`
 - `npm run test:flow` — 41 passing tests
 - `npm run build`

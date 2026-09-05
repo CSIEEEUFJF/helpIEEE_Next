@@ -1091,7 +1091,8 @@ test("cabeçalho e metadados preservam a identidade oficial IEEE", () => {
   assert.match(ieeeMasterBrandSource, /attributeFilter:\s*\['data-theme'\]/);
   assert.match(globalStylesSource, /\.site-header__ieee-master-brand\s*\{[^}]*width:\s*113px/s);
   assert.doesNotMatch(globalStylesSource, /font-weight:\s*900/);
-  assert.match(rootLayoutSource, /ieee-favicon-32x32\.png/);
+  assert.match(rootLayoutSource, /helpieee-favicon\.png/);
+  assert.doesNotMatch(rootLayoutSource, /ieee-favicon-32x32\.png/);
   assert.match(rootLayoutSource, /width:\s*1200/);
   assert.match(rootLayoutSource, /height:\s*630/);
   assert.match(siteFooterSource, /ieee-master-brand-white\.png/);

@@ -61,8 +61,8 @@ O processo detalhado está em [`README.md`](./README.md).
 
 Executado com sucesso em `2026-09-05`:
 
-- `npm run validate:content` — 6 guias, 20 seções, 81 itens, 67 links, 21 grades, 1.140 disciplinas, 19 catálogos e 1.795 eletivas
-- `npm run validate:links` — 46 de 46 links válidos
+- `npm run validate:content` — 6 guias, 20 seções, 80 itens, 66 links, 21 grades, 1.140 disciplinas, 19 catálogos e 1.795 eletivas
+- `npm run validate:links` — 45 de 45 links válidos
 - `npm run lint`
 - `npm run test:flow` — 41 testes aprovados
 - `npm run build`
